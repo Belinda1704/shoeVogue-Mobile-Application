@@ -1,0 +1,2 @@
+C:/Users/HP/flutter_app/android/app/.cxx/RelWithDebInfo/4x3c731z/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/HP/flutter_app/android/app/.cxx/RelWithDebInfo/4x3c731z/arm64-v8a/CMakeFiles/rebuild_cache.dir

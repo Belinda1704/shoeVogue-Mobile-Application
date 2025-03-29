@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class OTPVerificationView extends GetView {
   const OTPVerificationView({super.key});
@@ -212,7 +213,7 @@ class OTPVerificationController extends GetxController {
         otpError.value = 'Invalid verification code. Please try again.';
       }
     } catch (e) {
-      print('OTP verification error: $e');
+      debugPrint('OTP verification error: $e');
       otpError.value = 'Verification failed. Please try again.';
     } finally {
       isLoading.value = false;

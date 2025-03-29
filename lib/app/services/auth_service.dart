@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../routes/app_pages.dart';
-import 'dart:js' as js;
+import 'auth_service_web.dart' if (dart.library.io) 'auth_service_mobile.dart';
+import 'firestore_service.dart';
 
 class AuthService extends GetxService {
   static AuthService get to => Get.find();
@@ -21,7 +23,7 @@ class AuthService extends GetxService {
     ],
   );
   
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirestoreService _firestoreService = Get.find<FirestoreService>();
   
   Rx<User?> currentUser = Rx<User?>(null);
   
@@ -346,7 +348,7 @@ class AuthService extends GetxService {
         default:
           message = e.message ?? 'An error occurred during sign in.';
       }
-      print('Email Login Error: ${e.code} - $message');
+      debugPrint('Email Login Error: ${e.code} - $message');
       Get.snackbar(
         'Error',
         message,
@@ -354,7 +356,7 @@ class AuthService extends GetxService {
       );
       return null;
     } catch (e) {
-      print('General Login Error: $e');
+      debugPrint('General Login Error: $e');
       Get.snackbar(
         'Error',
         e.toString(),
@@ -449,100 +451,65 @@ class AuthService extends GetxService {
   // Google Sign In
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      UserCredential? userCredential;
+      
       if (kIsWeb) {
-        // Handle web sign in
-        GoogleAuthProvider googleProvider = GoogleAuthProvider();
-        googleProvider.addScope('email');
-        googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-        
+        // Web flow
         try {
-          final UserCredential userCredential = await _auth.signInWithPopup(googleProvider);
-          
-          if (userCredential.user != null) {
-            // Save user data to Firestore
-            await _saveUserToFirestore(userCredential.user!);
-          }
-          
-          return userCredential;
+          final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+          userCredential = await _auth.signInWithPopup(googleProvider);
         } catch (e) {
-          print('Web Google Sign In Error: $e');
-          Get.snackbar(
-            'Error',
-            'Failed to sign in with Google: ${e.toString()}',
-            snackPosition: SnackPosition.BOTTOM,
-          );
-          return null;
+          debugPrint('Web Google Sign In Error: $e');
+          throw 'Could not sign in with Google. Please try again.';
         }
       } else {
-        // Handle mobile sign in
-        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-        if (googleUser == null) return null;
-
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        final UserCredential userCredential = await _auth.signInWithCredential(credential);
+        // Mobile flow
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
         
-        if (userCredential.user != null) {
-          // Save user data to Firestore
-          await _saveUserToFirestore(userCredential.user!);
+        // User canceled the sign-in flow
+        if (googleUser == null) {
+          return null;
         }
         
-        return userCredential;
+        try {
+          final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+          final OAuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          
+          userCredential = await _auth.signInWithCredential(credential);
+        } catch (error) {
+          debugPrint('Google Sign In Error: $error');
+          throw 'Could not authenticate with Google. Please try again.';
+        }
       }
+      
+      // Save user data to Firestore
+      await _saveUserToFirestore(userCredential?.user);
+      
+      return userCredential;
     } catch (error) {
-      print('Google Sign In Error: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to sign in with Google: ${error.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return null;
+      rethrow;
     }
   }
   
-  Future<void> _saveUserToFirestore(User user) async {
+  Future<void> _saveUserToFirestore(User? user) async {
+    if (user == null) return;
+    
     try {
-      final userDoc = _firestore.collection('users').doc(user.uid);
-      
-      // Get user data
-      final userData = {
+      await _firestoreService.createOrUpdateUser({
         'uid': user.uid,
         'email': user.email,
-        'displayName': user.displayName,
-        'photoURL': user.photoURL,
-        'lastSignIn': FieldValue.serverTimestamp(),
+        'displayName': user.displayName ?? '',
+        'photoURL': user.photoURL ?? '',
+        'phoneNumber': user.phoneNumber ?? '',
+        'lastLogin': DateTime.now(),
         'createdAt': FieldValue.serverTimestamp(),
-      };
-
-      // Check if user already exists
-      final docSnapshot = await userDoc.get();
-      
-      if (docSnapshot.exists) {
-        // Update only lastSignIn if user exists
-        await userDoc.update({
-          'lastSignIn': FieldValue.serverTimestamp(),
-          'email': user.email,
-          'displayName': user.displayName,
-          'photoURL': user.photoURL,
-        });
-      } else {
-        // Create new user document if it doesn't exist
-        await userDoc.set(userData);
-      }
-      
-      // Update the currentUser stream
-      currentUser.value = user;
+      });
     } catch (error) {
-      print('Error saving user data: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to save user data: ${error.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      debugPrint('Error saving user data: $error');
+      // We don't throw here to prevent blocking sign-in even if Firestore update fails
     }
   }
   
@@ -551,8 +518,8 @@ class AuthService extends GetxService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print('Reset Password Error: $e');
-      rethrow;
+      debugPrint('Reset Password Error: $e');
+      throw 'Could not send password reset email. Please check your email address.';
     }
   }
   
@@ -561,24 +528,32 @@ class AuthService extends GetxService {
     isPhoneVerificationInProgress.value = true;
     
     try {
-      print('Starting phone verification for: $phoneNumber');
+      debugPrint('Starting phone verification for: $phoneNumber');
       
-      // For web, ensure there's a reCAPTCHA container available
       if (kIsWeb) {
-        print('Running on web, checking for reCAPTCHA container');
-      }
-      
-      await _auth.verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto-verify on some Android devices (only works on physical devices with SIM)
-          print('Auto-verification triggered');
-          try {
-            final userCredential = await _auth.signInWithCredential(credential);
-            isPhoneVerificationInProgress.value = false;
-            
-            // Update user profile
-            if (userCredential.user != null) {
+        debugPrint('Running on web, checking for reCAPTCHA container');
+        ConfirmationResult confirmationResult = await _auth.signInWithPhoneNumber(
+          phoneNumber,
+          RecaptchaVerifier(
+            container: 'recaptcha-container',
+            size: RecaptchaVerifierSize.compact,
+            theme: RecaptchaVerifierTheme.light,
+            auth: FirebaseAuthPlatform.instance,
+          ),
+        );
+        
+        verificationId.value = confirmationResult.verificationId;
+        isPhoneVerificationInProgress.value = false;
+        Get.toNamed('/verify-otp');
+      } else {
+        await _auth.verifyPhoneNumber(
+          phoneNumber: phoneNumber,
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            debugPrint('Auto-verification triggered');
+            try {
+              final userCredential = await _auth.signInWithCredential(credential);
+              isPhoneVerificationInProgress.value = false;
+              
               await FirebaseFirestore.instance
                   .collection('users')
                   .doc(userCredential.user!.uid)
@@ -586,73 +561,72 @@ class AuthService extends GetxService {
                 'phoneNumber': userCredential.user!.phoneNumber ?? '',
                 'updatedAt': FieldValue.serverTimestamp(),
               }, SetOptions(merge: true));
+              
+              Get.offAllNamed('/home');
+            } catch (e) {
+              debugPrint('Auto-verification error: $e');
+              isPhoneVerificationInProgress.value = false;
+              Get.snackbar(
+                'Error',
+                'Auto-verification failed: ${e.toString()}',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            }
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            isPhoneVerificationInProgress.value = false;
+            String message;
+            debugPrint('Phone verification failed: ${e.code} - ${e.message}');
+            
+            switch (e.code) {
+              case 'invalid-phone-number':
+                message = 'The phone number is not valid.';
+                break;
+              case 'too-many-requests':
+                message = 'Too many verification attempts. Try again later.';
+                break;
+              case 'app-not-authorized':
+                message = 'The app is not authorized to use Firebase Authentication.';
+                break;
+              case 'missing-client-identifier':
+                message = 'The reCAPTCHA token is missing. Try again.';
+                break;
+              case 'captcha-check-failed':
+                message = 'The reCAPTCHA verification failed. Try again.';
+                break;
+              case 'quota-exceeded':
+                message = 'The SMS quota for the project has been exceeded.';
+                break;
+              case 'billing-not-enabled':
+                message = 'Firebase billing is not enabled for this project. Phone authentication requires a billing account.';
+                _showBillingRequiredDialog();
+                return;
+              default:
+                message = e.message ?? 'An error occurred during phone verification.';
             }
             
-            Get.offAllNamed('/home');
-          } catch (e) {
-            print('Auto-verification error: $e');
+            if (e.code == 'missing-client-identifier' || e.code == 'captcha-check-failed') {
+              _showVerificationIssueDialog();
+            } else {
+              Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
+            }
+          },
+          codeSent: (String vId, int? resendToken) {
+            debugPrint('SMS code sent! Verification ID: $vId');
+            verificationId.value = vId;
             isPhoneVerificationInProgress.value = false;
-            Get.snackbar(
-              'Error',
-              'Auto-verification failed: ${e.toString()}',
-              snackPosition: SnackPosition.BOTTOM,
-            );
-          }
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          isPhoneVerificationInProgress.value = false;
-          String message;
-          print('Phone verification failed: ${e.code} - ${e.message}');
-          
-          switch (e.code) {
-            case 'invalid-phone-number':
-              message = 'The phone number is not valid.';
-              break;
-            case 'too-many-requests':
-              message = 'Too many verification attempts. Try again later.';
-              break;
-            case 'app-not-authorized':
-              message = 'The app is not authorized to use Firebase Authentication.';
-              break;
-            case 'missing-client-identifier':
-              message = 'The reCAPTCHA token is missing. Try again.';
-              break;
-            case 'captcha-check-failed':
-              message = 'The reCAPTCHA verification failed. Try again.';
-              break;
-            case 'quota-exceeded':
-              message = 'The SMS quota for the project has been exceeded.';
-              break;
-            case 'billing-not-enabled':
-              message = 'Firebase billing is not enabled for this project. Phone authentication requires a billing account.';
-              _showBillingRequiredDialog();
-              return;
-            default:
-              message = e.message ?? 'An error occurred during phone verification.';
-          }
-          
-          if (e.code == 'missing-client-identifier' || e.code == 'captcha-check-failed') {
-            // For reCAPTCHA specific issues, show a more helpful dialog
-            _showVerificationIssueDialog();
-          } else {
-            Get.snackbar('Error', message, snackPosition: SnackPosition.BOTTOM);
-          }
-        },
-        codeSent: (String vId, int? resendToken) {
-          print('SMS code sent! Verification ID: $vId');
-          verificationId.value = vId;
-          isPhoneVerificationInProgress.value = false;
-          Get.toNamed('/verify-otp');
-        },
-        codeAutoRetrievalTimeout: (String vId) {
-          print('Auto retrieval timeout');
-          verificationId.value = vId;
-          isPhoneVerificationInProgress.value = false;
-        },
-        timeout: const Duration(seconds: 120),
-      );
+            Get.toNamed('/verify-otp');
+          },
+          codeAutoRetrievalTimeout: (String vId) {
+            debugPrint('Auto retrieval timeout');
+            verificationId.value = vId;
+            isPhoneVerificationInProgress.value = false;
+          },
+          timeout: const Duration(seconds: 120),
+        );
+      }
     } catch (e) {
-      print('General phone verification error: $e');
+      debugPrint('General phone verification error: $e');
       isPhoneVerificationInProgress.value = false;
       
       if (e.toString().contains('reCAPTCHA')) {

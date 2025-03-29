@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:get_storage/get_storage.dart';
 
 class CartItem {
   final String id;
@@ -24,57 +26,72 @@ class CartController extends GetxController {
   // Make sure this is initialized properly
   final RxList<Map<String, dynamic>> cartItems = <Map<String, dynamic>>[].obs;
   final RxDouble total = 0.0.obs;
+  final storage = GetStorage();
 
   @override
   void onInit() {
     super.onInit();
-    calculateTotal();
-    print('CartController initialized with ${cartItems.length} items');
+    loadCart();
+    debugPrint('CartController initialized with ${cartItems.length} items');
   }
 
-  void addToCart(Map<String, dynamic> product, {double? size}) {
-    // Convert the product to a new Map to avoid reference issues
-    final Map<String, dynamic> productCopy = Map<String, dynamic>.from(product);
+  // Load cart items from local storage
+  void loadCart() {
+    final savedCart = storage.read<List>('cart');
+    if (savedCart != null) {
+      cartItems.value = savedCart.map((item) => Map<String, dynamic>.from(item)).toList();
+      calculateTotals();
+    }
+  }
+
+  // Save cart items to local storage
+  void saveCart() {
+    storage.write('cart', cartItems.toList());
+  }
+
+  // Calculate total price of all items in cart
+  void calculateTotals() {
+    double sum = 0;
+    for (var item in cartItems) {
+      sum += (item['price'] ?? 0.0) * (item['quantity'] ?? 1);
+    }
+    total.value = sum;
+  }
+
+  void addToCart(Map<String, dynamic> product, {int quantity = 1}) {
+    // Deep copy the product to avoid reference issues
+    final productCopy = Map<String, dynamic>.from(product);
     
-    print('Adding to cart: ${productCopy['name']} (ID: ${productCopy['id']})');
+    debugPrint('Adding to cart: ${productCopy['name']} (ID: ${productCopy['id']})');
     
-    // Deep copy to avoid reference issues
-    final String productId = productCopy['id'].toString();
-    final double productSize = size ?? 0.0;
-    
-    // Check if product exists in cart
-    final int existingIndex = cartItems.indexWhere((item) => 
-        item['id'].toString() == productId && 
-        (item['size'] ?? 0.0) == productSize);
+    // Check if this product is already in the cart
+    final existingIndex = cartItems.indexWhere((item) => item['id'] == productCopy['id']);
     
     if (existingIndex >= 0) {
-      // Update quantity of existing item
-      cartItems[existingIndex]['quantity'] = (cartItems[existingIndex]['quantity'] ?? 0) + 1;
-      print('Updated quantity for existing product in cart: ${cartItems[existingIndex]['name']}');
+      // If it exists, update quantity
+      cartItems[existingIndex]['quantity'] = (cartItems[existingIndex]['quantity'] ?? 1) + quantity;
+      // Update the price to reflect the new quantity
+      cartItems[existingIndex]['totalPrice'] = 
+          (cartItems[existingIndex]['price'] ?? 0.0) * cartItems[existingIndex]['quantity'];
+      
+      debugPrint('Updated quantity for existing product in cart: ${cartItems[existingIndex]['name']}');
     } else {
-      // Add as new item
-      productCopy['quantity'] = 1;
-      productCopy['size'] = productSize;
+      // Add quantity and totalPrice to the product
+      productCopy['quantity'] = quantity;
+      productCopy['totalPrice'] = (productCopy['price'] ?? 0.0) * quantity;
       cartItems.add(productCopy);
-      print('Added new product to cart: ${productCopy['name']}');
+      
+      debugPrint('Added new product to cart: ${productCopy['name']}');
     }
     
-    // Force refresh
-    cartItems.refresh();
-    calculateTotal();
+    calculateTotals();
+    saveCart();
     
-    // Print cart contents for debugging
-    print('Cart now contains ${cartItems.length} items:');
+    // Use debugPrint for debugging info
+    debugPrint('Cart now contains ${cartItems.length} items:');
     for (var item in cartItems) {
-      print('- ${item['name']} (Qty: ${item['quantity']})');
+      debugPrint('- ${item['name']} (Qty: ${item['quantity']})');
     }
-    
-    // Show feedback
-    Get.snackbar(
-      'Added to Cart',
-      '${productCopy['name']} has been added to your cart',
-      snackPosition: SnackPosition.BOTTOM,
-    );
   }
 
   void removeFromCart(String id, double? size) {
@@ -82,7 +99,8 @@ class CartController extends GetxController {
       item['id'].toString() == id && 
       (item['size'] ?? 0.0) == (size ?? 0.0));
     cartItems.refresh();
-    calculateTotal();
+    calculateTotals();
+    saveCart();
   }
 
   void updateQuantity(String id, double? size, int quantity) {
@@ -96,22 +114,16 @@ class CartController extends GetxController {
       } else {
         cartItems[index]['quantity'] = quantity;
         cartItems.refresh();
-        calculateTotal();
+        calculateTotals();
+        saveCart();
       }
     }
   }
 
-  void calculateTotal() {
-    double sum = 0;
-    for (var item in cartItems) {
-      sum += (item['price'] * (item['quantity'] ?? 1));
-    }
-    total.value = sum;
-  }
-
   void clearCart() {
     cartItems.clear();
-    calculateTotal();
+    calculateTotals();
+    saveCart();
   }
 
   Future<void> checkout() async {

@@ -45,7 +45,8 @@ class FavoritesView extends GetView<FavoritesController> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      Get.back();
+                      // Navigate to Home tab
+                      homeController.changePage(0);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

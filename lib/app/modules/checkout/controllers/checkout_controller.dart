@@ -13,6 +13,10 @@ class CheckoutController extends GetxController {
   final zipController = TextEditingController();
   final phoneController = TextEditingController();
   
+  // Observable values for country and phone
+  final country = 'United States'.obs;
+  final phoneNumber = ''.obs;
+  
   // Loading state
   final isLoading = false.obs;
   

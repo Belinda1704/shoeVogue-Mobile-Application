@@ -18,36 +18,43 @@ class ProductSearchController extends GetxController {
   }
   
   void searchProducts(String query) {
-    isLoading.value = true;
-    
-    // Print debug information
-    print('Search query: "$query"');
-    print('Total products: ${homeController.products.length}');
-    
     if (query.isEmpty) {
-      // If query is empty, show all products
-      searchResults.value = homeController.products;
-      print('Showing all ${searchResults.length} products');
-    } else {
-      // Filter products that contain the query in name or category (case insensitive)
-      searchResults.value = homeController.products
-          .where((product) {
-            final name = product['name']?.toString().toLowerCase() ?? '';
-            final category = product['category']?.toString().toLowerCase() ?? '';
-            final searchLower = query.toLowerCase();
-            
-            final matchesName = name.contains(searchLower);
-            final matchesCategory = category.contains(searchLower);
-            
-            print('Product: ${product['name']} - Matches name: $matchesName, Matches category: $matchesCategory');
-            
-            return matchesName || matchesCategory;
-          })
-          .toList();
-      print('Found ${searchResults.length} matching products');
+      searchResults.clear();
+      return;
+    }
+
+    // Convert to lowercase for case-insensitive search
+    final lowerCaseQuery = query.toLowerCase();
+    
+    // Debug with debugPrint instead of print
+    debugPrint('Search query: "$query"');
+    debugPrint('Total products: ${homeController.products.length}');
+
+    searchResults.clear();
+    
+    if (lowerCaseQuery.isEmpty) {
+      searchResults.assignAll(homeController.products);
+      debugPrint('Showing all ${searchResults.length} products');
+      return;
+    }
+
+    // Filter products based on name or category match
+    for (final product in homeController.products) {
+      final name = (product['name'] as String).toLowerCase();
+      final category = (product['category'] as String).toLowerCase();
+      
+      final matchesName = name.contains(lowerCaseQuery);
+      final matchesCategory = category.contains(lowerCaseQuery);
+      
+      // Debug with debugPrint
+      debugPrint('Product: ${product['name']} - Matches name: $matchesName, Matches category: $matchesCategory');
+      
+      if (matchesName || matchesCategory) {
+        searchResults.add(product);
+      }
     }
     
-    isLoading.value = false;
+    debugPrint('Found ${searchResults.length} matching products');
   }
   
   void toggleFavorite(String id) {

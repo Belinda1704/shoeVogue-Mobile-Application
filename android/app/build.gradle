@@ -20,14 +20,14 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = '17'
     }
 
     defaultConfig {
         // Specify your unique Application ID
         applicationId = "com.example.flutter_app"
         // Update these values to match your application needs
-        minSdk = 21 // Updated for Firebase
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

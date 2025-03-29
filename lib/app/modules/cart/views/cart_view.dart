@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/cart_controller.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../home/controllers/home_controller.dart';
 
 class CartView extends GetView<CartController> {
   const CartView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Add debug print
-    print('Building CartView - Items in cart: ${controller.cartItems.length}');
+    // Remove debug prints
     
     return Scaffold(
       appBar: AppBar(
@@ -18,8 +18,7 @@ class CartView extends GetView<CartController> {
         foregroundColor: Colors.white,
       ),
       body: Obx(() {
-        // More debug info
-        print('CartView Obx rebuild - Items: ${controller.cartItems.length}');
+        // Remove debug prints
         
         if (controller.cartItems.isEmpty) {
           return Center(
@@ -44,7 +43,9 @@ class CartView extends GetView<CartController> {
                 const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
-                    Get.back();
+                    // Navigate to Home tab
+                    final homeController = Get.find<HomeController>();
+                    homeController.changePage(0);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
@@ -176,7 +177,7 @@ class CartView extends GetView<CartController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'total'.tr + ':',
+                          '${'total'.tr}:',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

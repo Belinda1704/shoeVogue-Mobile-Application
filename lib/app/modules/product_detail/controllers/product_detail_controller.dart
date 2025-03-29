@@ -7,6 +7,7 @@ class ProductDetailController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxBool isFavorite = false.obs;
   final RxDouble selectedSize = 8.5.obs;
+  final RxInt quantity = 1.obs;
   
   final homeController = Get.find<HomeController>();
   final cartController = Get.find<CartController>();
@@ -46,7 +47,7 @@ class ProductDetailController extends GetxController {
     // Get the cart controller
     final cartController = Get.find<CartController>();
     
-    // Add the product to cart with selected size
-    cartController.addToCart(product.toJson(), size: selectedSize.value);
+    // Add the product to cart with the current quantity
+    cartController.addToCart(product.toJson(), quantity: quantity.value);
   }
 } 

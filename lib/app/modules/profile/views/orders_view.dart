@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrdersView extends GetView<ProfileController> {
   const OrdersView({super.key});
@@ -52,13 +53,40 @@ class OrdersView extends GetView<ProfileController> {
           itemCount: controller.orders.length,
           itemBuilder: (context, index) {
             final order = controller.orders[index];
-            final formattedDate = DateFormat('MMM dd, yyyy').format(
-              DateTime.parse(order['date']),
-            );
-            final formattedTotal = NumberFormat.currency(
-              symbol: '\$',
-              decimalDigits: 2,
-            ).format(order['total']);
+            
+            // Safely handle the date formatting
+            String formattedDate;
+            try {
+              // Check if date exists and is in the correct format
+              if (order['date'] != null) {
+                formattedDate = DateFormat('MMM dd, yyyy').format(
+                  DateTime.parse(order['date'].toString()),
+                );
+              } else if (order['createdAt'] != null) {
+                // Try to use createdAt timestamp if date is missing
+                final Timestamp timestamp = order['createdAt'] as Timestamp;
+                formattedDate = DateFormat('MMM dd, yyyy').format(timestamp.toDate());
+              } else {
+                // Fallback if no valid date is found
+                formattedDate = 'N/A';
+              }
+            } catch (e) {
+              debugPrint('Error formatting date: $e');
+              formattedDate = 'N/A';
+            }
+            
+            // Safely format the total
+            String formattedTotal;
+            try {
+              final total = order['total'] ?? order['totalAmount'] ?? 0.0;
+              formattedTotal = NumberFormat.currency(
+                symbol: '\$',
+                decimalDigits: 2,
+              ).format(total);
+            } catch (e) {
+              debugPrint('Error formatting total: $e');
+              formattedTotal = '\$0.00';
+            }
             
             return Card(
               margin: const EdgeInsets.only(bottom: 16),
@@ -98,20 +126,47 @@ class OrdersView extends GetView<ProfileController> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: (order['items'] as List).length,
+                    itemCount: (order['items'] as List?)?.length ?? 0,
                     itemBuilder: (context, itemIndex) {
-                      final item = order['items'][itemIndex];
-                      final itemTotal = item['price'] * item['quantity'];
-                      final formattedItemTotal = NumberFormat.currency(
-                        symbol: '\$',
-                        decimalDigits: 2,
-                      ).format(itemTotal);
-                      
-                      return ListTile(
-                        title: Text(item['name']),
-                        subtitle: Text('Qty: ${item['quantity']}'),
-                        trailing: Text(formattedItemTotal),
-                      );
+                      try {
+                        final items = order['items'] as List?;
+                        if (items == null || items.isEmpty || itemIndex >= items.length) {
+                          return const ListTile(
+                            title: Text('Unknown item'),
+                            subtitle: Text('No details available'),
+                          );
+                        }
+                        
+                        final item = items[itemIndex];
+                        if (item == null) {
+                          return const ListTile(
+                            title: Text('Unknown item'),
+                            subtitle: Text('No details available'),
+                          );
+                        }
+                        
+                        final String name = item['name']?.toString() ?? 'Unknown item';
+                        final int quantity = item['quantity'] is int ? item['quantity'] : 1;
+                        final double price = (item['price'] is num) ? (item['price'] as num).toDouble() : 0.0;
+                        final double itemTotal = price * quantity;
+                        
+                        final formattedItemTotal = NumberFormat.currency(
+                          symbol: '\$',
+                          decimalDigits: 2,
+                        ).format(itemTotal);
+                        
+                        return ListTile(
+                          title: Text(name),
+                          subtitle: Text('Qty: $quantity'),
+                          trailing: Text(formattedItemTotal),
+                        );
+                      } catch (e) {
+                        debugPrint('Error rendering order item: $e');
+                        return const ListTile(
+                          title: Text('Error'),
+                          subtitle: Text('Could not load item details'),
+                        );
+                      }
                     },
                   ),
                   
@@ -134,11 +189,11 @@ class OrdersView extends GetView<ProfileController> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(order['status']),
+                            color: _getStatusColor(order['status']?.toString() ?? 'pending'),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            order['status'],
+                            (order['status']?.toString() ?? 'Pending').capitalize!,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -175,16 +230,24 @@ class OrdersView extends GetView<ProfileController> {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(String? status) {
+    if (status == null) return Colors.grey;
+    
     switch (status.toLowerCase()) {
       case 'delivered':
         return Colors.green;
-      case 'processing':
+      case 'processing': 
+      case 'processed':
         return Colors.orange;
       case 'shipped':
+      case 'shipping':
         return Colors.blue;
       case 'cancelled':
+      case 'canceled':
         return Colors.red;
+      case 'pending':
+      case 'paid':
+        return Colors.amber;
       default:
         return Colors.grey;
     }

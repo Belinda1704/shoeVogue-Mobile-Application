@@ -1,20 +1,31 @@
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
-
+import 'dart:async';
+import '../../../services/firestore_service.dart';
+import '../../../data/models/banner_model.dart';
 import '../../../../utils/constants/image_strings.dart';
 
 class HomeController extends GetxController {
+  final FirestoreService _firestoreService = Get.find<FirestoreService>();
+  
   // Observable variables
   final _currentIndex = 0.obs;
   final _products = <Map<String, dynamic>>[].obs;
   final _selectedCategory = 'All'.obs;
   final _filteredProducts = <Map<String, dynamic>>[].obs;
+  final _banners = <BannerModel>[].obs;
+  final _isLoadingBanners = true.obs;
+  
+  // Stream subscriptions
+  StreamSubscription<List<BannerModel>>? _bannersSubscription;
 
   // Getters
   int get currentIndex => _currentIndex.value;
   List<Map<String, dynamic>> get products => _products;
   String get selectedCategory => _selectedCategory.value;
   List<Map<String, dynamic>> get filteredProducts => _filteredProducts;
+  List<BannerModel> get banners => _banners;
+  bool get isLoadingBanners => _isLoadingBanners.value;
 
   // Setters
   set currentIndex(int value) => _currentIndex.value = value;
@@ -27,6 +38,79 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadProducts();
+    loadBanners();
+  }
+  
+  @override
+  void onClose() {
+    _bannersSubscription?.cancel();
+    super.onClose();
+  }
+
+  void loadBanners() {
+    try {
+      _isLoadingBanners.value = true;
+      _bannersSubscription = _firestoreService.getBanners().listen(
+        (bannerList) {
+          if (bannerList.isEmpty) {
+            // If Firebase banners are empty, use local assets
+            _loadLocalBanners();
+          } else {
+            _banners.value = bannerList;
+          }
+          _isLoadingBanners.value = false;
+        },
+        onError: (error) {
+          debugPrint('Error loading banners from Firebase: $error');
+          // On error, fallback to local banners
+          _loadLocalBanners();
+          _isLoadingBanners.value = false;
+        }
+      );
+    } catch (e) {
+      debugPrint('Error subscribing to banners: $e');
+      // On exception, fallback to local banners
+      _loadLocalBanners();
+      _isLoadingBanners.value = false;
+    }
+  }
+
+  void _loadLocalBanners() {
+    final List<BannerModel> localBanners = [
+      BannerModel(
+        id: 'local_banner_1',
+        imageUrl: 'assets/images/banners/banner_1.jpg',
+        title: 'Summer Collection',
+        subtitle: 'Check out our latest summer styles',
+        actionText: 'Shop Now',
+        actionUrl: '/products?category=summer',
+        isActive: true,
+        priority: 1,
+      ),
+      BannerModel(
+        id: 'local_banner_2',
+        imageUrl: 'assets/images/banners/banner_2.jpg',
+        title: 'Limited Edition',
+        subtitle: 'Get them before they\'re gone',
+        actionText: 'Explore',
+        actionUrl: '/products?category=limited',
+        isActive: true,
+        priority: 2,
+      ),
+      BannerModel(
+        id: 'local_banner_3',
+        imageUrl: 'assets/images/banners/banner_3.jpg',
+        title: 'Special Discount',
+        subtitle: 'Up to 50% off on select items',
+        actionText: 'View Offers',
+        actionUrl: '/products?category=sale',
+        isActive: true,
+        priority: 3,
+      ),
+    ];
+    
+    _banners.value = localBanners;
+    debugPrint('Using local banner assets as fallback');
   }
 
   void changePage(int index) => currentIndex = index;
@@ -132,7 +216,7 @@ class HomeController extends GetxController {
         'id': '9',
         'name': 'Adidas Casual',
         'price': 129.99,
-        'imageUrl': 'assets/images/products/TennisCasualAdidas.png',
+        'imageUrl': 'assets/images/products/NikeAirMax.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -140,7 +224,7 @@ class HomeController extends GetxController {
         'id': '10',
         'name': 'Adidas',
         'price': 139.99,
-        'imageUrl': 'assets/images/products/Addidas1.png',
+        'imageUrl': 'assets/images/products/Addidas 1.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -148,7 +232,7 @@ class HomeController extends GetxController {
         'id': '11',
         'name': 'Airforce 2',
         'price': 149.99,
-        'imageUrl': 'assets/images/products/Airfoce2.png',
+        'imageUrl': 'assets/images/products/Airfoce 2.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -156,7 +240,7 @@ class HomeController extends GetxController {
         'id': '12',
         'name': 'Airforce 1',
         'price': 159.99,
-        'imageUrl': 'assets/images/products/Airforce1.png',
+        'imageUrl': 'assets/images/products/Airforce 1.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -164,7 +248,7 @@ class HomeController extends GetxController {
         'id': '13',
         'name': 'Jordan 5',
         'price': 219.99,
-        'imageUrl': 'assets/images/products/Jordan5.png',
+        'imageUrl': 'assets/images/products/Jordan 5.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -172,7 +256,7 @@ class HomeController extends GetxController {
         'id': '14',
         'name': 'New Balance 4',
         'price': 109.99,
-        'imageUrl': 'assets/images/products/NewBalance4.png',
+        'imageUrl': 'assets/images/products/New Balance 4.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -180,7 +264,7 @@ class HomeController extends GetxController {
         'id': '15',
         'name': 'New Balance 5',
         'price': 119.99,
-        'imageUrl': 'assets/images/products/NewBalance5.png',
+        'imageUrl': 'assets/images/products/New Balance 5.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -188,7 +272,7 @@ class HomeController extends GetxController {
         'id': '16',
         'name': 'New Balance 6',
         'price': 129.99,
-        'imageUrl': 'assets/images/products/NewBalance6.png',
+        'imageUrl': 'assets/images/products/New Balance 6.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -196,7 +280,7 @@ class HomeController extends GetxController {
         'id': '17',
         'name': 'Nike Defy',
         'price': 149.99,
-        'imageUrl': 'assets/images/products/NikeDefy.png',
+        'imageUrl': 'assets/images/products/Nike Defy.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -204,7 +288,7 @@ class HomeController extends GetxController {
         'id': '18',
         'name': 'Nike Pull Up',
         'price': 139.99,
-        'imageUrl': 'assets/images/products/NikePullUp.png',
+        'imageUrl': 'assets/images/products/Nike pull up.png',
         'category': 'Sneakers',
         'isFavorite': false,
       },
@@ -336,7 +420,7 @@ class HomeController extends GetxController {
         'id': '34',
         'name': "Women's Shoe",
         'price': 139.99,
-        'imageUrl': "assets/images/products/WomensShoe.png",
+        'imageUrl': 'assets/images/products/Women’s Shoe.png',
         'category': 'Sports',
         'isFavorite': false,
       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class PhoneAuthView extends GetView {
   const PhoneAuthView({super.key});
@@ -168,7 +169,7 @@ class PhoneAuthViewController extends GetxController {
     try {
       await authService.verifyPhoneNumber(completePhoneNumber.value);
     } catch (e) {
-      print('Error in view controller: $e');
+      debugPrint('Error in view controller: $e');
       Get.snackbar(
         'Error',
         'Something went wrong. Please try again.',

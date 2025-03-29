@@ -11,10 +11,18 @@ class OrderSuccessView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.check_circle,
-              color: Colors.green,
-              size: 100,
+            Image.asset(
+              'assets/icons/payment_methods/successful_payment_icon.png',
+              width: 120,
+              height: 120,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback icon if image fails to load
+                return const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 100,
+                );
+              },
             ),
             const SizedBox(height: 24),
             Text(

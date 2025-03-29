@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import '../data/models/product_model.dart';
 import '../data/models/user_model.dart';
+import '../data/models/banner_model.dart';
 
 class FirestoreService extends GetxService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,6 +15,7 @@ class FirestoreService extends GetxService {
   final String brandsCollection = 'brands';
   final String cartCollection = 'cart';
   final String ordersCollection = 'orders';
+  final String bannersCollection = 'banners';
 
   @override
   void onInit() {
@@ -159,6 +161,40 @@ class FirestoreService extends GetxService {
 
         await _firestore.collection(ordersCollection).add(sampleOrder);
         debugPrint('Orders collection structure initialized');
+      }
+
+      // Initialize Banners collection
+      final bannersSnapshot = await _firestore.collection(bannersCollection).limit(1).get();
+      if (bannersSnapshot.docs.isEmpty) {
+        final List<Map<String, dynamic>> banners = [
+          {
+            'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/shoevogueapp.appspot.com/o/banners%2Fbanner1.jpg?alt=media',
+            'title': 'Summer Sale',
+            'subtitle': 'Up to 50% off on select items',
+            'actionText': 'Shop Now',
+            'actionUrl': '/products?category=summer-sale',
+            'isActive': true,
+            'priority': 1,
+            'startDate': FieldValue.serverTimestamp(),
+            'endDate': Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))),
+          },
+          {
+            'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/shoevogueapp.appspot.com/o/banners%2Fbanner2.jpg?alt=media',
+            'title': 'New Arrivals',
+            'subtitle': 'Check out our latest collection',
+            'actionText': 'Explore',
+            'actionUrl': '/products?category=new-arrivals',
+            'isActive': true,
+            'priority': 2,
+            'startDate': FieldValue.serverTimestamp(),
+            'endDate': null,
+          },
+        ];
+
+        for (final banner in banners) {
+          await _firestore.collection(bannersCollection).add(banner);
+        }
+        debugPrint('Sample banners added to Firestore');
       }
 
       // Initialize Products with references to categories and brands
@@ -374,6 +410,28 @@ class FirestoreService extends GetxService {
     }
   }
 
+  // Create or update user data (used by auth service)
+  Future<void> createOrUpdateUser(Map<String, dynamic> userData) async {
+    try {
+      final String uid = userData['uid'];
+      final userDoc = _firestore.collection(usersCollection).doc(uid);
+      
+      // Check if user exists
+      final docSnapshot = await userDoc.get();
+      
+      if (docSnapshot.exists) {
+        // Update existing user
+        await userDoc.update(userData);
+      } else {
+        // Create new user
+        await userDoc.set(userData);
+      }
+    } catch (e) {
+      debugPrint('Error in createOrUpdateUser: $e');
+      throw e;
+    }
+  }
+
   // Get user orders
   Stream<List<Map<String, dynamic>>> getUserOrders(String userId) {
     return _firestore
@@ -401,5 +459,65 @@ class FirestoreService extends GetxService {
               .map((doc) => Product.fromMap(doc.id, doc.data()))
               .toList();
         });
+  }
+
+  // Banner operations
+  
+  // Get all active banners as stream
+  Stream<List<BannerModel>> getBanners() {
+    return _firestore
+        .collection(bannersCollection)
+        .where('isActive', isEqualTo: true)
+        .orderBy('priority')
+        .snapshots()
+        .map((snapshot) {
+          final now = DateTime.now();
+          return snapshot.docs
+              .map((doc) => BannerModel.fromMap(doc.data(), doc.id))
+              .where((banner) {
+                // Filter by date range if specified
+                if (banner.startDate != null && now.isBefore(banner.startDate!)) {
+                  return false;
+                }
+                if (banner.endDate != null && now.isAfter(banner.endDate!)) {
+                  return false;
+                }
+                return true;
+              })
+              .toList();
+        });
+  }
+  
+  // Add a new banner
+  Future<String?> createBanner(BannerModel banner) async {
+    try {
+      final docRef = await _firestore.collection(bannersCollection).add(banner.toMap());
+      return docRef.id;
+    } catch (e) {
+      debugPrint('Error creating banner: $e');
+      return null;
+    }
+  }
+  
+  // Update a banner
+  Future<bool> updateBanner(String id, BannerModel banner) async {
+    try {
+      await _firestore.collection(bannersCollection).doc(id).update(banner.toMap());
+      return true;
+    } catch (e) {
+      debugPrint('Error updating banner: $e');
+      return false;
+    }
+  }
+  
+  // Delete a banner
+  Future<bool> deleteBanner(String id) async {
+    try {
+      await _firestore.collection(bannersCollection).doc(id).delete();
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting banner: $e');
+      return false;
+    }
   }
 } 

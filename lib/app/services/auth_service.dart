@@ -15,6 +15,10 @@ class AuthService extends GetxService {
   // Configure Google Sign-In
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     clientId: kIsWeb ? '872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com' : null,
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+    ],
   );
   
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -443,48 +447,36 @@ class AuthService extends GetxService {
   }
   
   // Google Sign In
-  Future<void> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     try {
-      // Show loading indicator
-      Get.dialog(
-        const Center(child: CircularProgressIndicator()),
-        barrierDismissible: false,
-      );
-
-      UserCredential? userCredential;
-
       if (kIsWeb) {
+        // Handle web sign in
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        googleProvider.addScope('email');
+        googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+        
         try {
-          // Call the JavaScript function we defined
-          final result = await js.context.callMethod('eval', [
-            'window.flutterWebGoogleSignIn.signIn()'
-          ]) as js.JsObject;
-
-          // Get the credential from the response
-          final credential = GoogleAuthProvider.credential(
-            idToken: result['credential'] as String?,
-            accessToken: null, // Web flow doesn't provide access token
-          );
-
-          // Sign in with Firebase using the credential
-          userCredential = await _auth.signInWithCredential(credential);
+          final UserCredential userCredential = await _auth.signInWithPopup(googleProvider);
+          
+          if (userCredential.user != null) {
+            // Save user data to Firestore
+            await _saveUserToFirestore(userCredential.user!);
+          }
+          
+          return userCredential;
         } catch (e) {
           print('Web Google Sign In Error: $e');
-          Get.back(); // Close loading dialog
           Get.snackbar(
             'Error',
-            'Failed to sign in with Google. Please try again.',
+            'Failed to sign in with Google: ${e.toString()}',
             snackPosition: SnackPosition.BOTTOM,
           );
-          return;
+          return null;
         }
       } else {
-        // Mobile sign in flow remains the same
+        // Handle mobile sign in
         final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-        if (googleUser == null) {
-          Get.back(); // Close loading dialog
-          return;
-        }
+        if (googleUser == null) return null;
 
         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
@@ -492,44 +484,65 @@ class AuthService extends GetxService {
           idToken: googleAuth.idToken,
         );
 
-        userCredential = await _auth.signInWithCredential(credential);
-      }
-
-      if (userCredential?.user != null) {
-        // Save user data to Firestore
-        await _saveUserToFirestore(userCredential!.user!);
+        final UserCredential userCredential = await _auth.signInWithCredential(credential);
         
-        // Close loading dialog
-        Get.back();
+        if (userCredential.user != null) {
+          // Save user data to Firestore
+          await _saveUserToFirestore(userCredential.user!);
+        }
         
-        // Navigate to home
-        Get.offAllNamed(Routes.HOME);
+        return userCredential;
       }
     } catch (error) {
-      // Close loading dialog
-      Get.back();
-      
       print('Google Sign In Error: $error');
       Get.snackbar(
         'Error',
         'Failed to sign in with Google: ${error.toString()}',
         snackPosition: SnackPosition.BOTTOM,
       );
+      return null;
     }
   }
   
   Future<void> _saveUserToFirestore(User user) async {
     try {
-      await _firestore.collection('users').doc(user.uid).set({
+      final userDoc = _firestore.collection('users').doc(user.uid);
+      
+      // Get user data
+      final userData = {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
         'photoURL': user.photoURL,
         'lastSignIn': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      print('Error saving user data: $e');
+      };
+
+      // Check if user already exists
+      final docSnapshot = await userDoc.get();
+      
+      if (docSnapshot.exists) {
+        // Update only lastSignIn if user exists
+        await userDoc.update({
+          'lastSignIn': FieldValue.serverTimestamp(),
+          'email': user.email,
+          'displayName': user.displayName,
+          'photoURL': user.photoURL,
+        });
+      } else {
+        // Create new user document if it doesn't exist
+        await userDoc.set(userData);
+      }
+      
+      // Update the currentUser stream
+      currentUser.value = user;
+    } catch (error) {
+      print('Error saving user data: $error');
+      Get.snackbar(
+        'Error',
+        'Failed to save user data: ${error.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
   

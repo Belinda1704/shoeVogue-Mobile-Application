@@ -30,7 +30,7 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <!-- Google Sign-In Client ID -->
-  <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLOUD_CLIENT_ID.apps.googleusercontent.com">
+  <meta name="google-signin-client_id" content="872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com">
 
   <title>ShoeVogue</title>
   <link rel="manifest" href="manifest.json">
@@ -47,7 +47,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   
   <!-- Load the Google Identity Services API -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
   <!-- reCAPTCHA container - DO NOT REMOVE -->
@@ -72,42 +72,51 @@
     });
   </script>
   
-  <!-- Initialize Google Sign In -->
   <script>
-    window.flutterWebGoogleSignIn = {
-      signIn: function() {
-        return new Promise(function(resolve, reject) {
-          try {
-            google.accounts.id.initialize({
-              client_id: '872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com', // Replace with your client ID
-              callback: function(response) {
-                if (response.credential) {
-                  resolve(response);
-                } else {
-                  reject('No credential returned');
-                }
-              },
-              auto_select: false,
-            });
-
-            google.accounts.id.prompt(function(notification) {
-              if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                reject('Google Sign In prompt not displayed');
-              }
-            });
-          } catch (error) {
-            reject(error);
-          }
-        });
-      }
+    // Initialize Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB5yYRvgByJj1uF3QAjfoDocaehtRupl9I",
+      authDomain: "shoevogueapp.firebaseapp.com",
+      projectId: "shoevogueapp",
+      storageBucket: "shoevogueapp.firebasestorage.app",
+      messagingSenderId: "872644437819",
+      appId: "1:872644437819:web:977f6b76a8fb891d8cb91e"
     };
-  </script>
 
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Initialize Google Sign In after page load
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Initialize Google Sign-In
+    window.initializeGoogleSignIn = function() {
+      google.accounts.id.initialize({
+        client_id: '872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com',
+        callback: handleGoogleSignIn,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+    };
+
+    // Handle Google Sign-In callback
+    function handleGoogleSignIn(response) {
+      if (response.credential) {
+        // Create a credential from the Google ID token
+        const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
+        
+        // Sign in to Firebase with the credential
+        firebase.auth().signInWithCredential(credential)
+          .then((result) => {
+            console.log('Successfully signed in:', result);
+          })
+          .catch((error) => {
+            console.error('Error signing in:', error);
+          });
+      }
+    }
+
+    // Initialize Google Sign-In when the page loads
+    window.addEventListener('load', function() {
       if (typeof google !== 'undefined') {
-        window.onGoogleSignInInit();
+        window.initializeGoogleSignIn();
       }
     });
   </script>

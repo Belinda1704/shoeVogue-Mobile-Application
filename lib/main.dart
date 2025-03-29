@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'app/services/auth_service.dart';
 import 'app/services/firebase_service.dart';
+import 'app/services/firestore_service.dart';
 import 'app.dart';
 import 'firebase_options.dart';
 import 'app/services/payment_service.dart';
@@ -26,6 +27,7 @@ void main() async {
   
   // Initialize Services
   Get.put(FirebaseService());
+  Get.put(FirestoreService());
   await Get.putAsync(() => AuthService().init());
   await Get.putAsync(() => PaymentService().init());
   

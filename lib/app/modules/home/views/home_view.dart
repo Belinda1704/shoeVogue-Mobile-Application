@@ -5,6 +5,7 @@ import '../../cart/views/cart_view.dart';
 import '../../favorites/views/favorites_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../../utils/currency_formatter.dart';
+import '../../../routes/app_pages.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -15,6 +16,12 @@ class HomeView extends GetView<HomeController> {
     
     return Scaffold(
       key: scaffoldKey,
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          // Removing product management action
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,

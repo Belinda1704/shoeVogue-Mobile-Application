@@ -33,6 +33,10 @@ import '../modules/auth/views/phone_auth_view.dart';
 import '../modules/auth/views/otp_verification_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/onboarding/views/onboarding_view.dart';
+import '../modules/products/bindings/product_binding.dart';
+import '../modules/products/views/product_list_view.dart';
+import '../modules/users/bindings/user_binding.dart';
+import '../modules/users/views/user_list_view.dart';
 
 part 'app_routes.dart';
 
@@ -150,6 +154,16 @@ class AppPages {
     GetPage(
       name: Routes.VERIFY_OTP,
       page: () => const OTPVerificationView(),
+    ),
+    GetPage(
+      name: Routes.PRODUCTS,
+      page: () => const HomeView(),
+      binding: HomeBinding(),
+    ),
+    GetPage(
+      name: Routes.USERS,
+      page: () => const HomeView(),
+      binding: HomeBinding(),
     ),
   ];
 } 

@@ -27,6 +27,8 @@ abstract class Routes {
   static const PROFILE_ABOUT = '/profile/about';
   static const PHONE_AUTH = '/phone-auth';
   static const VERIFY_OTP = '/verify-otp';
+  static const PRODUCTS = '/products';
+  static const USERS = '/users';
 }
 
 abstract class _Paths {
@@ -54,4 +56,6 @@ abstract class _Paths {
   static const PROFILE_ABOUT = '/profile/about';
   static const PHONE_AUTH = '/phone-auth';
   static const VERIFY_OTP = '/verify-otp';
+  static const PRODUCTS = '/products';
+  static const USERS = '/users';
 } 

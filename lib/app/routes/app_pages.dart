@@ -3,6 +3,7 @@ import 'package:shoe_vogue/app/modules/auth/bindings/auth_binding.dart';
 import 'package:shoe_vogue/app/modules/auth/views/login_view.dart';
 import 'package:shoe_vogue/app/modules/auth/views/signup_view.dart';
 import 'package:shoe_vogue/app/modules/auth/views/forgot_password_view.dart';
+import 'package:shoe_vogue/app/modules/auth/controllers/forgot_password_controller.dart';
 import 'package:shoe_vogue/app/modules/auth/views/email_verification_view.dart';
 import 'package:shoe_vogue/app/modules/home/bindings/home_binding.dart';
 import 'package:shoe_vogue/app/modules/home/views/home_view.dart';
@@ -38,7 +39,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.ONBOARDING;
+  static const INITIAL = Routes.LOGIN;
 
   static final routes = [
     GetPage(
@@ -59,7 +60,9 @@ class AppPages {
     GetPage(
       name: Routes.FORGOT_PASSWORD,
       page: () => const ForgotPasswordView(),
-      binding: AuthBinding(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ForgotPasswordController());
+      }),
     ),
     GetPage(
       name: Routes.EMAIL_VERIFICATION,

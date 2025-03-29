@@ -550,17 +550,9 @@ class AuthService extends GetxService {
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      Get.snackbar(
-        'Success',
-        'Password reset email sent. Please check your inbox.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      print('Reset Password Error: $e');
+      rethrow;
     }
   }
   

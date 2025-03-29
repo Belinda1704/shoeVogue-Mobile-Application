@@ -94,8 +94,14 @@ class LoginView extends GetView {
                       const Text('Remember Me'),
                       const Spacer(),
                       TextButton(
-                        onPressed: () => Get.toNamed('/forgot-password'),
-                        child: const Text('Forgot Password?'),
+                        onPressed: () => Get.toNamed(Routes.FORGOT_PASSWORD),
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ],
                   ),

@@ -29,18 +29,19 @@ class App extends StatelessWidget {
   const App({super.key});
 
   String _getLanguageCode(String savedLanguage) {
-    switch (savedLanguage) {
-      case 'English':
-        return 'en';
-      case 'Español':
-        return 'es';
-      case 'Français':
-        return 'fr';
-      case 'Deutsch':
-        return 'de';
-      default:
-        return 'en';
-    }
+    final Map<String, String> languageMap = {
+      'English': 'en',
+      'Spanish': 'es',
+      'Español': 'es',
+      'French': 'fr',
+      'Français': 'fr',
+      'German': 'de',
+      'Deutsch': 'de',
+      'Italian': 'it',
+      'Portuguese': 'pt',
+    };
+    
+    return languageMap[savedLanguage] ?? 'en';
   }
 
   Future<String> _getInitialRoute() async {

@@ -20,6 +20,20 @@ class AppTranslations extends Translations {
       'settings': 'Settings',
       'view_all': 'View all',
       'popular_products': 'Popular Products',
+      'skip': 'Skip',
+      'next': 'Next',
+      'get_started': 'Get Started',
+      'image_not_found': 'Image not found',
+
+      // Onboarding
+      'welcome_to_shoevogue': 'Welcome to ShoeVogue',
+      'discover_latest_trends': 'Discover the latest trends in footwear fashion',
+      'shop_with_ease': 'Shop with Ease',
+      'browse_collection': 'Browse through our curated collection of premium shoes',
+      'fast_delivery': 'Fast Delivery',
+      'get_shoes_delivered': 'Get your favorite shoes delivered right to your doorstep',
+      'always_connected': 'Always Connected',
+      'stay_updated': 'Stay updated with the latest arrivals and exclusive offers',
 
       // Auth
       'sign_in': 'Sign In',
@@ -88,6 +102,8 @@ class AppTranslations extends Translations {
       'help_center': 'Help Center',
       'about_us': 'About Us',
       'log_out': 'Log Out',
+      'contact_us': 'Contact Us',
+      'contact_feature_coming_soon': 'This feature is coming soon!',
       
       // Product
       'Add to Cart': 'Add to Cart',
@@ -107,10 +123,19 @@ class AppTranslations extends Translations {
       'remove': 'Remove',
       'quantity': 'Quantity',
       
+      // Order Success
+      'order_placed_success': 'Order Placed Successfully!',
+      'order_delivery_message': 'Your order has been placed and will be delivered soon.',
+      
       // Product Details
       'Product Details': 'Product Details',
       'Select Size': 'Select Size',
       'product_description': 'Premium quality footwear with excellent comfort and durability. Perfect for everyday wear and special occasions.',
+      
+      // Favorites
+      'no_favorites': 'No favorites yet',
+      'add_to_favorites_message': 'Add items to your favorites to see them here',
+      'browse_products': 'Browse Products',
     },
     'es': {
       // General
@@ -129,6 +154,20 @@ class AppTranslations extends Translations {
       'settings': 'Configuración',
       'view_all': 'Ver todo',
       'popular_products': 'Productos Populares',
+      'skip': 'Omitir',
+      'next': 'Siguiente',
+      'get_started': 'Comenzar',
+      'image_not_found': 'Imagen no encontrada',
+
+      // Onboarding
+      'welcome_to_shoevogue': 'Bienvenido a ShoeVogue',
+      'discover_latest_trends': 'Descubre las últimas tendencias en moda de calzado',
+      'shop_with_ease': 'Compra con Facilidad',
+      'browse_collection': 'Navega por nuestra colección seleccionada de zapatos premium',
+      'fast_delivery': 'Entrega Rápida',
+      'get_shoes_delivered': 'Recibe tus zapatos favoritos directamente en tu puerta',
+      'always_connected': 'Siempre Conectado',
+      'stay_updated': 'Mantente actualizado con las últimas llegadas y ofertas exclusivas',
 
       // Auth
       'sign_in': 'Iniciar Sesión',
@@ -197,6 +236,8 @@ class AppTranslations extends Translations {
       'help_center': 'Centro de Ayuda',
       'about_us': 'Sobre Nosotros',
       'log_out': 'Cerrar Sesión',
+      'contact_us': 'Contáctanos',
+      'contact_feature_coming_soon': '¡Esta función estará disponible pronto!',
       
       // Product
       'Add to Cart': 'Añadir al Carrito',
@@ -216,10 +257,19 @@ class AppTranslations extends Translations {
       'remove': 'Eliminar',
       'quantity': 'Cantidad',
       
+      // Order Success
+      'order_placed_success': '¡Pedido Realizado con Éxito!',
+      'order_delivery_message': 'Tu pedido ha sido realizado y será entregado pronto.',
+      
       // Product Details
       'Product Details': 'Detalles del Producto',
       'Select Size': 'Seleccionar Talla',
       'product_description': 'Calzado de primera calidad con excelente comodidad y durabilidad. Perfecto para uso diario y ocasiones especiales.',
+      
+      // Favorites
+      'no_favorites': 'Aún no hay favoritos',
+      'add_to_favorites_message': 'Agrega artículos a tus favoritos para verlos aquí',
+      'browse_products': 'Explorar Productos',
     },
     'fr': {
       // General
@@ -238,6 +288,20 @@ class AppTranslations extends Translations {
       'settings': 'Paramètres',
       'view_all': 'Voir tout',
       'popular_products': 'Produits Populaires',
+      'skip': 'Passer',
+      'next': 'Suivant',
+      'get_started': 'Commencer',
+      'image_not_found': 'Image non trouvée',
+
+      // Onboarding
+      'welcome_to_shoevogue': 'Bienvenue sur ShoeVogue',
+      'discover_latest_trends': 'Découvrez les dernières tendances de la mode chaussure',
+      'shop_with_ease': 'Achetez Facilement',
+      'browse_collection': 'Parcourez notre collection sélectionnée de chaussures premium',
+      'fast_delivery': 'Livraison Rapide',
+      'get_shoes_delivered': 'Recevez vos chaussures préférées directement à votre porte',
+      'always_connected': 'Toujours Connecté',
+      'stay_updated': 'Restez informé des dernières arrivées et des offres exclusives',
 
       // Auth
       'sign_in': 'Se connecter',
@@ -263,6 +327,8 @@ class AppTranslations extends Translations {
       'help_center': "Centre d'Aide",
       'about_us': 'À Propos de Nous',
       'log_out': 'Se Déconnecter',
+      'contact_us': 'Contactez-nous',
+      'contact_feature_coming_soon': 'Cette fonctionnalité sera bientôt disponible!',
 
       // Product
       'add_to_cart': 'Ajouter au panier',
@@ -298,6 +364,15 @@ class AppTranslations extends Translations {
       'checkout': 'Procéder au paiement',
       'remove': 'Supprimer',
       'quantity': 'Quantité',
+      
+      // Order Success
+      'order_placed_success': 'Commande Passée avec Succès!',
+      'order_delivery_message': 'Votre commande a été passée et sera livrée bientôt.',
+      
+      // Favorites
+      'no_favorites': 'Pas encore de favoris',
+      'add_to_favorites_message': 'Ajoutez des articles à vos favoris pour les voir ici',
+      'browse_products': 'Parcourir les Produits',
     },
     'de': {
       // General
@@ -316,6 +391,20 @@ class AppTranslations extends Translations {
       'settings': 'Einstellungen',
       'view_all': 'Alle anzeigen',
       'popular_products': 'Beliebte Produkte',
+      'skip': 'Überspringen',
+      'next': 'Weiter',
+      'get_started': 'Loslegen',
+      'image_not_found': 'Bild nicht gefunden',
+
+      // Onboarding
+      'welcome_to_shoevogue': 'Willkommen bei ShoeVogue',
+      'discover_latest_trends': 'Entdecken Sie die neuesten Trends der Schuhmode',
+      'shop_with_ease': 'Einfach Einkaufen',
+      'browse_collection': 'Durchstöbern Sie unsere kuratierte Kollektion hochwertiger Schuhe',
+      'fast_delivery': 'Schnelle Lieferung',
+      'get_shoes_delivered': 'Lassen Sie sich Ihre Lieblingsschuhe direkt nach Hause liefern',
+      'always_connected': 'Immer Verbunden',
+      'stay_updated': 'Bleiben Sie über die neuesten Ankünfte und exklusiven Angebote informiert',
 
       // Auth
       'sign_in': 'Anmelden',
@@ -341,6 +430,8 @@ class AppTranslations extends Translations {
       'help_center': 'Hilfezentrum',
       'about_us': 'Über Uns',
       'log_out': 'Abmelden',
+      'contact_us': 'Kontaktiere uns',
+      'contact_feature_coming_soon': 'Diese Funktion wird bald verfügbar sein!',
 
       // Product
       'add_to_cart': 'In den Warenkorb',
@@ -376,6 +467,15 @@ class AppTranslations extends Translations {
       'checkout': 'Zur Kasse',
       'remove': 'Entfernen',
       'quantity': 'Menge',
+      
+      // Order Success
+      'order_placed_success': 'Bestellung erfolgreich aufgegeben!',
+      'order_delivery_message': 'Ihre Bestellung wurde aufgegeben und wird in Kürze geliefert.',
+      
+      // Favorites
+      'no_favorites': 'Noch keine Favoriten',
+      'add_to_favorites_message': 'Fügen Sie Artikel zu Ihren Favoriten hinzu, um sie hier zu sehen',
+      'browse_products': 'Produkte durchsuchen',
     },
   };
 } 

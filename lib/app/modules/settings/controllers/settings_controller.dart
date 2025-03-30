@@ -77,7 +77,16 @@ class SettingsController extends GetxController {
       orElse: () => languages[0],
     )['code']!;
     
+    // Log information for debugging
+    debugPrint('Changing language to: $language (code: $languageCode)');
+    
     Get.updateLocale(Locale(languageCode));
+    
+    // Refresh UI to ensure all translations are updated
+    Future.delayed(Duration(milliseconds: 100), () {
+      Get.forceAppUpdate();
+    });
+    
     Get.back();
   }
 

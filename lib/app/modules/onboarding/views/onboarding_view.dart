@@ -14,8 +14,8 @@ class OnboardingView extends StatelessWidget {
     return IntroductionScreen(
       pages: [
         PageViewModel(
-          title: "Welcome to ShoeVogue",
-          body: "Discover the latest trends in footwear fashion",
+          title: "welcome_to_shoevogue".tr,
+          body: "discover_latest_trends".tr,
           image: Image.asset('assets/images/on_boarding_images/sammy-line-searching.gif'),
           decoration: PageDecoration(
             titleTextStyle: TextStyle(
@@ -35,8 +35,8 @@ class OnboardingView extends StatelessWidget {
           ),
         ),
         PageViewModel(
-          title: "Shop with Ease",
-          body: "Browse through our curated collection of premium shoes",
+          title: "shop_with_ease".tr,
+          body: "browse_collection".tr,
           image: Image.asset('assets/images/on_boarding_images/sammy-line-shopping.gif'),
           decoration: PageDecoration(
             titleTextStyle: TextStyle(
@@ -55,8 +55,8 @@ class OnboardingView extends StatelessWidget {
           ),
         ),
         PageViewModel(
-          title: "Fast Delivery",
-          body: "Get your favorite shoes delivered right to your doorstep",
+          title: "fast_delivery".tr,
+          body: "get_shoes_delivered".tr,
           image: Image.asset('assets/images/on_boarding_images/sammy-line-delivery.gif'),
           decoration: PageDecoration(
             titleTextStyle: TextStyle(
@@ -75,8 +75,8 @@ class OnboardingView extends StatelessWidget {
           ),
         ),
         PageViewModel(
-          title: "Always Connected",
-          body: "Stay updated with the latest arrivals and exclusive offers",
+          title: "always_connected".tr,
+          body: "stay_updated".tr,
           image: Image.asset('assets/images/on_boarding_images/sammy-line-no-connection.gif'),
           decoration: PageDecoration(
             titleTextStyle: TextStyle(
@@ -97,19 +97,19 @@ class OnboardingView extends StatelessWidget {
       ],
       showSkipButton: true,
       skip: Text(
-        'Skip',
+        'skip'.tr,
         style: TextStyle(
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
       next: Text(
-        'Next',
+        'next'.tr,
         style: TextStyle(
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
       done: Text(
-        'Get Started', 
+        'get_started'.tr, 
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Theme.of(context).colorScheme.primary,

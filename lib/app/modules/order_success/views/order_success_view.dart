@@ -26,7 +26,7 @@ class OrderSuccessView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Order Placed Successfully!',
+              'order_placed_success'.tr,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -35,7 +35,7 @@ class OrderSuccessView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                'Your order has been placed and will be delivered soon.',
+                'order_delivery_message'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey[600],
@@ -49,13 +49,13 @@ class OrderSuccessView extends StatelessWidget {
                 Get.offAllNamed('/home');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
-              child: const Text(
-                'Continue Shopping',
-                style: TextStyle(
+              child: Text(
+                'continue_shopping'.tr,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

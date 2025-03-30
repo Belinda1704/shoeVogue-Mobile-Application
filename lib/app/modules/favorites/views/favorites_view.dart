@@ -12,9 +12,9 @@ class FavoritesView extends GetView<FavoritesController> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: Text('favorites'.tr),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: GetX<HomeController>(
         builder: (controller) {
@@ -34,12 +34,12 @@ class FavoritesView extends GetView<FavoritesController> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'No favorites yet',
+                    'no_favorites'.tr,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Add items to your favorites to see them here',
+                    'add_to_favorites_message'.tr,
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 30),
@@ -49,11 +49,11 @@ class FavoritesView extends GetView<FavoritesController> {
                       homeController.changePage(0);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
-                    child: const Text('Browse Products'),
+                    child: Text('browse_products'.tr),
                   ),
                 ],
               ),
@@ -104,7 +104,7 @@ class FavoritesView extends GetView<FavoritesController> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Image not found',
+                                      'image_not_found'.tr,
                                       style: TextStyle(
                                         color: Colors.grey[400],
                                         fontSize: 12,
@@ -138,13 +138,13 @@ class FavoritesView extends GetView<FavoritesController> {
                               children: [
                                 Text(
                                   '\$${product['price'].toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.delete_outline,
                                     color: Colors.red,
                                     size: 20,

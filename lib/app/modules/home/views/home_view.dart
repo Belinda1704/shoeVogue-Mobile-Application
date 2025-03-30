@@ -19,7 +19,7 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text('home'.tr),
         actions: [
           // Removing product management action
         ],

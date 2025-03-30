@@ -77,6 +77,13 @@ class MockHomeController extends GetxController implements HomeController {
   }
 
   @override
+  Future<void> syncFavoritesFromFirestore() async {
+    // Mock implementation for testing
+    // No need for actual implementation in tests
+    return;
+  }
+  
+  @override
   void loadBanners() {
     _banners.value = [
       BannerModel(
@@ -132,7 +139,9 @@ class MockHomeController extends GetxController implements HomeController {
   StreamSubscription<List<BannerModel>>? get bannersSubscription => null;
 
   @override
-  void onClose() {}
+  void onClose() {
+    super.onClose();
+  }
 }
 
 // A simplified version of the test

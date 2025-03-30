@@ -4,9 +4,15 @@ import 'dart:async';
 import '../../../services/firestore_service.dart';
 import '../../../data/models/banner_model.dart';
 import '../../../../utils/constants/image_strings.dart';
+import '../../favorites/controllers/favorites_controller.dart';
+import '../../../services/auth_service.dart';
+import '../../../modules/cart/controllers/cart_controller.dart';
+import 'package:flutter/material.dart';
 
 class HomeController extends GetxController {
   final FirestoreService _firestoreService = Get.find<FirestoreService>();
+  final FavoritesController _favoritesController = Get.find<FavoritesController>();
+  final AuthService _authService = Get.find<AuthService>();
   
   // Observable variables
   final _currentIndex = 0.obs;
@@ -37,8 +43,11 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadProducts();
+    _currentIndex.value = 0;
+    _selectedCategory.value = 'All';
     loadBanners();
+    loadProducts();
+    syncFavoritesFromFirestore();
   }
   
   @override
@@ -131,18 +140,87 @@ class HomeController extends GetxController {
     final index = _products.indexWhere((product) => product['id'] == id);
     if (index != -1) {
       final product = Map<String, dynamic>.from(_products[index]);
-      product['isFavorite'] = !(product['isFavorite'] ?? false);
+      final bool newFavoriteStatus = !(product['isFavorite'] ?? false);
+      
+      // Check if user is logged in
+      final String? userId = _authService.currentUser.value?.uid;
+      if (userId == null) {
+        Get.snackbar(
+          'Sign In Required',
+          'Please sign in to save your favorites',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+      
+      // Update local UI state
+      product['isFavorite'] = newFavoriteStatus;
       _products[index] = product;
+      
+      // Update favorites in Firestore
+      if (newFavoriteStatus) {
+        _firestoreService.addToFavorites(userId, id).then((success) {
+          if (success) {
+            debugPrint('Added product $id to favorites in Firestore');
+          } else {
+            debugPrint('Failed to add product $id to favorites in Firestore');
+          }
+        });
+      } else {
+        _firestoreService.removeFromFavorites(userId, id).then((success) {
+          if (success) {
+            debugPrint('Removed product $id from favorites in Firestore');
+          } else {
+            debugPrint('Failed to remove product $id from favorites in Firestore');
+          }
+        });
+      }
+      
+      // Refresh the UI
+      _products.refresh();
       filterProducts();
+      
+      // Show feedback to user
+      Get.snackbar(
+        'Favorites Updated',
+        newFavoriteStatus ? 'Added to favorites' : 'Removed from favorites',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
   void addToCart(String productId) {
-    Get.snackbar(
-      'Added to Cart',
-      'Product added to your cart successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    try {
+      // Find the product in products list
+      final product = _products.firstWhere(
+        (product) => product['id'] == productId,
+        orElse: () => throw Exception('Product not found'),
+      );
+      
+      // Get the cart controller
+      final cartController = Get.find<CartController>();
+      
+      // Add the product to cart
+      cartController.addToCart(product);
+      
+      // Show success message
+      Get.snackbar(
+        'Added to Cart',
+        '${product['name']} added to your cart successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error adding to cart: $e');
+      Get.snackbar(
+        'Error',
+        'Could not add product to cart',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   void loadProducts() {
@@ -420,7 +498,7 @@ class HomeController extends GetxController {
         'id': '34',
         'name': "Women's Shoe",
         'price': 139.99,
-        'imageUrl': 'assets/images/products/Women’s Shoe.png',
+        'imageUrl': "assets/images/products/Women's Shoe.png",
         'category': 'Sports',
         'isFavorite': false,
       },
@@ -525,5 +603,44 @@ class HomeController extends GetxController {
     ];
     
     filterProducts();
+  }
+
+  // Sync favorite status from Firestore
+  Future<void> syncFavoritesFromFirestore() async {
+    // Check if user is logged in
+    final String? userId = _authService.currentUser.value?.uid;
+    if (userId == null) {
+      debugPrint('User not logged in, skipping favorites sync');
+      return;
+    }
+    
+    try {
+      // Get user document from Firestore
+      final userDoc = await _firestoreService.getUser(userId);
+      if (userDoc == null) {
+        debugPrint('User document not found in Firestore');
+        return;
+      }
+      
+      // Get favorite product IDs
+      final List<String> favoriteIds = List<String>.from(userDoc.favoriteProducts);
+      debugPrint('Retrieved ${favoriteIds.length} favorite products from Firestore');
+      
+      // Update local products with favorite status
+      for (int i = 0; i < _products.length; i++) {
+        final product = Map<String, dynamic>.from(_products[i]);
+        final String productId = product['id'].toString();
+        
+        // Set isFavorite based on whether the ID exists in favoriteIds
+        product['isFavorite'] = favoriteIds.contains(productId);
+        _products[i] = product;
+      }
+      
+      // Refresh products in UI
+      _products.refresh();
+      filterProducts();
+    } catch (e) {
+      debugPrint('Error syncing favorites from Firestore: $e');
+    }
   }
 } 

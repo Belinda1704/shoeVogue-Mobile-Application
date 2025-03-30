@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../data/models/product_model.dart';
 import '../data/models/user_model.dart';
 import '../data/models/banner_model.dart';
+import '../data/models/category_model.dart';
 
 class FirestoreService extends GetxService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -21,6 +22,7 @@ class FirestoreService extends GetxService {
   void onInit() {
     super.onInit();
     initializeDatabase();
+    initializeDefaultCategories();
   }
 
   Future<void> initializeDatabase() async {
@@ -517,6 +519,316 @@ class FirestoreService extends GetxService {
       return true;
     } catch (e) {
       debugPrint('Error deleting banner: $e');
+      return false;
+    }
+  }
+
+  // Add a product to user's favorites
+  Future<bool> addToFavorites(String userId, String productId) async {
+    try {
+      final userDoc = _firestore.collection(usersCollection).doc(userId);
+      
+      // Get current user data
+      final userSnapshot = await userDoc.get();
+      if (!userSnapshot.exists) {
+        debugPrint('User document does not exist');
+        return false;
+      }
+      
+      // Get current favorites
+      List<String> favorites = List<String>.from(userSnapshot.data()?['favoriteProducts'] ?? []);
+      
+      // Add product if not already in favorites
+      if (!favorites.contains(productId)) {
+        favorites.add(productId);
+        await userDoc.update({
+          'favoriteProducts': favorites,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        debugPrint('Product added to favorites');
+      }
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error adding to favorites: $e');
+      return false;
+    }
+  }
+
+  // Remove a product from user's favorites
+  Future<bool> removeFromFavorites(String userId, String productId) async {
+    try {
+      final userDoc = _firestore.collection(usersCollection).doc(userId);
+      
+      // Get current user data
+      final userSnapshot = await userDoc.get();
+      if (!userSnapshot.exists) {
+        debugPrint('User document does not exist');
+        return false;
+      }
+      
+      // Get current favorites
+      List<String> favorites = List<String>.from(userSnapshot.data()?['favoriteProducts'] ?? []);
+      
+      // Remove product if it exists in favorites
+      if (favorites.contains(productId)) {
+        favorites.remove(productId);
+        await userDoc.update({
+          'favoriteProducts': favorites,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        debugPrint('Product removed from favorites');
+      }
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error removing from favorites: $e');
+      return false;
+    }
+  }
+
+  // Get user's favorite products
+  Future<List<Product>> getUserFavoriteProducts(String userId) async {
+    try {
+      // Get the user's favorite product IDs
+      final userDoc = await _firestore.collection(usersCollection).doc(userId).get();
+      if (!userDoc.exists) {
+        debugPrint('User document does not exist');
+        return [];
+      }
+      
+      List<String> favoriteIds = List<String>.from(userDoc.data()?['favoriteProducts'] ?? []);
+      
+      if (favoriteIds.isEmpty) {
+        return [];
+      }
+      
+      // Get the product details for each favorite ID
+      final productsQuery = await _firestore
+          .collection(productsCollection)
+          .where(FieldPath.documentId, whereIn: favoriteIds)
+          .get();
+          
+      return productsQuery.docs
+          .map((doc) => Product.fromMap(doc.id, doc.data()))
+          .toList();
+    } catch (e) {
+      debugPrint('Error getting favorite products: $e');
+      return [];
+    }
+  }
+
+  // Check if a product is in user's favorites
+  Future<bool> isProductFavorite(String userId, String productId) async {
+    try {
+      final userDoc = await _firestore.collection(usersCollection).doc(userId).get();
+      if (!userDoc.exists) {
+        return false;
+      }
+      
+      List<String> favorites = List<String>.from(userDoc.data()?['favoriteProducts'] ?? []);
+      return favorites.contains(productId);
+    } catch (e) {
+      debugPrint('Error checking favorite status: $e');
+      return false;
+    }
+  }
+
+  // Get all product categories
+  Stream<List<CategoryModel>> getCategories() {
+    return _firestore
+        .collection(categoriesCollection)
+        .orderBy('name')
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return CategoryModel.fromMap(doc.data(), doc.id);
+          }).toList();
+        });
+  }
+
+  // Create a new category
+  Future<String?> createCategory(CategoryModel category) async {
+    try {
+      final docRef = await _firestore.collection(categoriesCollection).add(category.toMap());
+      return docRef.id;
+    } catch (e) {
+      debugPrint('Error creating category: $e');
+      return null;
+    }
+  }
+
+  // Update a category
+  Future<bool> updateCategory(String id, CategoryModel category) async {
+    try {
+      await _firestore.collection(categoriesCollection).doc(id).update(category.toMap());
+      return true;
+    } catch (e) {
+      debugPrint('Error updating category: $e');
+      return false;
+    }
+  }
+
+  // Delete a category
+  Future<bool> deleteCategory(String id) async {
+    try {
+      await _firestore.collection(categoriesCollection).doc(id).delete();
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting category: $e');
+      return false;
+    }
+  }
+
+  // Initialize default categories if none exist
+  Future<void> initializeDefaultCategories() async {
+    try {
+      final categoriesSnapshot = await _firestore.collection(categoriesCollection).limit(1).get();
+      if (categoriesSnapshot.docs.isEmpty) {
+        final List<CategoryModel> categories = [
+          CategoryModel(
+            name: 'Sneakers',
+            description: 'Athletic and casual sneakers for everyday wear',
+            icon: 'shoe',
+            featured: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          CategoryModel(
+            name: 'Formal',
+            description: 'Formal and dress shoes for professional settings',
+            icon: 'business-shoe',
+            featured: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          CategoryModel(
+            name: 'Sports',
+            description: 'Performance shoes for athletic activities',
+            icon: 'running-shoe',
+            featured: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          CategoryModel(
+            name: 'Casual',
+            description: 'Comfortable shoes for everyday casual wear',
+            icon: 'casual-shoe', 
+            featured: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        ];
+
+        for (final category in categories) {
+          await _firestore.collection(categoriesCollection).add(category.toMap());
+        }
+        debugPrint('Default categories initialized');
+      }
+    } catch (e) {
+      debugPrint('Error initializing default categories: $e');
+    }
+  }
+
+  // Add an item to user's cart
+  Future<bool> addToCart(String userId, Map<String, dynamic> item) async {
+    try {
+      final userCartRef = _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection('cart');
+      
+      // Use product ID as document ID
+      final String itemId = item['id'].toString();
+      
+      // First check if the item already exists
+      final existingDoc = await userCartRef.doc(itemId).get();
+      
+      if (existingDoc.exists) {
+        // Update existing item (modify quantity)
+        final existingData = existingDoc.data() ?? {};
+        final int currentQuantity = existingData['quantity'] ?? 1;
+        final int newQuantity = (item['quantity'] ?? 1) + currentQuantity;
+        
+        // Update quantity and total price
+        item['quantity'] = newQuantity;
+        item['totalPrice'] = (item['price'] ?? 0.0) * newQuantity;
+        
+        await userCartRef.doc(itemId).update(item);
+        debugPrint('Updated quantity for item in cart: $itemId');
+      } else {
+        // Add new item
+        await userCartRef.doc(itemId).set(item);
+        debugPrint('Added new item to cart: $itemId');
+      }
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error adding to cart: $e');
+      return false;
+    }
+  }
+  
+  // Get all items in user's cart
+  Future<List<Map<String, dynamic>>> getUserCartItems(String userId) async {
+    try {
+      final userCartRef = _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection('cart');
+      
+      final cartSnapshot = await userCartRef.get();
+      
+      if (cartSnapshot.docs.isEmpty) {
+        return [];
+      }
+      
+      return cartSnapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      debugPrint('Error getting cart items: $e');
+      return [];
+    }
+  }
+  
+  // Remove an item from user's cart
+  Future<bool> removeFromCart(String userId, String itemId) async {
+    try {
+      await _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection('cart')
+          .doc(itemId)
+          .delete();
+      
+      debugPrint('Removed item from cart: $itemId');
+      return true;
+    } catch (e) {
+      debugPrint('Error removing from cart: $e');
+      return false;
+    }
+  }
+  
+  // Clear all items from user's cart
+  Future<bool> clearCart(String userId) async {
+    try {
+      final cartRef = _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection('cart');
+      
+      final batch = _firestore.batch();
+      final snapshots = await cartRef.get();
+      
+      for (var doc in snapshots.docs) {
+        batch.delete(doc.reference);
+      }
+      
+      await batch.commit();
+      
+      debugPrint('Cart cleared for user: $userId');
+      return true;
+    } catch (e) {
+      debugPrint('Error clearing cart: $e');
       return false;
     }
   }

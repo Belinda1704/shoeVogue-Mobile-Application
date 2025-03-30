@@ -16,9 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
+    FavoritesBinding().dependencies();
     HomeBinding().dependencies();
     CartBinding().dependencies();
-    FavoritesBinding().dependencies();
     SearchBinding().dependencies();
     ProfileBinding().dependencies();
     SettingsBinding().dependencies();

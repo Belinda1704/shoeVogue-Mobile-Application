@@ -20,6 +20,7 @@ class SignupView extends GetView {
     // Form validation
     final formKey = GlobalKey<FormState>();
     final privacyAccepted = false.obs;
+    final isPasswordVisible = false.obs;
     String completePhoneNumber = '';
 
     return Scaffold(
@@ -147,12 +148,13 @@ class SignupView extends GetView {
                   const SizedBox(height: 16),
                   
                   // Password
-                  _buildInputField(
+                  Obx(() => _buildInputField(
                     controller: passwordController,
                     hintText: 'Password',
                     prefixIcon: Icons.lock_outline,
-                    suffixIcon: Icons.visibility_off_outlined,
-                    obscureText: true,
+                    suffixIcon: isPasswordVisible.value ? Icons.visibility : Icons.visibility_off,
+                    suffixIconOnTap: () => isPasswordVisible.value = !isPasswordVisible.value,
+                    obscureText: !isPasswordVisible.value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Password is required';
@@ -162,7 +164,7 @@ class SignupView extends GetView {
                       }
                       return null;
                     },
-                  ),
+                  )),
                   const SizedBox(height: 16),
                   
                   // Privacy Policy Checkbox
@@ -364,6 +366,7 @@ class SignupView extends GetView {
     required String hintText,
     required IconData prefixIcon,
     IconData? suffixIcon,
+    VoidCallback? suffixIconOnTap,
     bool obscureText = false,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
@@ -381,7 +384,12 @@ class SignupView extends GetView {
         decoration: InputDecoration(
           hintText: hintText,
           prefixIcon: Icon(prefixIcon, color: Colors.grey[600]),
-          suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: Colors.grey[600]) : null,
+          suffixIcon: suffixIcon != null 
+            ? IconButton(
+                icon: Icon(suffixIcon, color: Colors.grey[600]),
+                onPressed: suffixIconOnTap,
+              ) 
+            : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),

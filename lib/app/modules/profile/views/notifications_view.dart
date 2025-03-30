@@ -9,132 +9,140 @@ class NotificationsView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: Text('notifications'.tr),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Notification Preferences',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Text(
+              'notification_settings'.tr,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             
             // Push notifications
-            Obx(() => SwitchListTile(
-              title: const Text('Push Notifications'),
-              subtitle: const Text('Receive alerts on your device'),
-              value: controller.pushNotifications.value,
-              onChanged: (value) => controller.toggleNotificationSetting('push', value),
-              activeColor: Colors.blue,
-            )),
+            _buildNotificationOption(
+              context,
+              'push_notifications'.tr,
+              'push_notifications_desc'.tr,
+              controller.isPushNotificationsEnabled,
+              (value) => controller.togglePushNotifications(value),
+            ),
             
             const Divider(),
             
             // Email notifications
-            Obx(() => SwitchListTile(
-              title: const Text('Email Notifications'),
-              subtitle: const Text('Receive alerts via email'),
-              value: controller.emailNotifications.value,
-              onChanged: (value) => controller.toggleNotificationSetting('email', value),
-              activeColor: Colors.blue,
-            )),
+            _buildNotificationOption(
+              context,
+              'email_notifications'.tr,
+              'email_notifications_desc'.tr,
+              controller.isEmailNotificationsEnabled,
+              (value) => controller.toggleEmailNotifications(value),
+            ),
             
             const Divider(),
             
-            // Order updates
-            Obx(() => SwitchListTile(
-              title: const Text('Order Updates'),
-              subtitle: const Text('Get notified about order status changes'),
-              value: controller.orderUpdates.value,
-              onChanged: (value) => controller.toggleNotificationSetting('orders', value),
-              activeColor: Colors.blue,
-            )),
-            
-            const Divider(),
-            
-            // Promotions
-            Obx(() => SwitchListTile(
-              title: const Text('Promotions & Deals'),
-              subtitle: const Text('Receive information about sales and offers'),
-              value: controller.promotions.value,
-              onChanged: (value) => controller.toggleNotificationSetting('promotions', value),
-              activeColor: Colors.blue,
-            )),
-            
-            const SizedBox(height: 32),
-            const Text(
-              'Notification History',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            // Notification categories
+            const SizedBox(height: 16),
+            Text(
+              'notification_categories'.tr,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             
-            Card(
-              child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child: Icon(
-                    Icons.local_shipping,
-                    color: Colors.white,
-                  ),
-                ),
-                title: const Text('Your order has been shipped!'),
-                subtitle: const Text('Order #ORD-001 is on its way to you.'),
-                trailing: const Text('2 hours ago'),
-                onTap: () {},
-              ),
+            _buildNotificationCategory(
+              context,
+              'order_updates'.tr,
+              Icons.local_shipping,
             ),
             
-            const SizedBox(height: 8),
-            
-            Card(
-              child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.green,
-                  child: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                ),
-                title: const Text('Payment successful'),
-                subtitle: const Text('Your payment for order #ORD-002 was successful.'),
-                trailing: const Text('Yesterday'),
-                onTap: () {},
-              ),
+            _buildNotificationCategory(
+              context,
+              'promotions'.tr,
+              Icons.discount,
             ),
             
-            const SizedBox(height: 8),
-            
-            Card(
-              child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.discount,
-                    color: Colors.white,
-                  ),
-                ),
-                title: const Text('Flash Sale! 25% Off'),
-                subtitle: const Text('Get 25% off on all Nike products for 24 hours!'),
-                trailing: const Text('2 days ago'),
-                onTap: () {},
-              ),
+            _buildNotificationCategory(
+              context,
+              'new_arrivals'.tr,
+              Icons.new_releases,
             ),
-            
-            const SizedBox(height: 32),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNotificationOption(
+    BuildContext context,
+    String title,
+    String description,
+    RxBool value,
+    Function(bool) onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Obx(() => Switch(
+            value: value.value,
+            onChanged: onChanged,
+            activeColor: Theme.of(context).colorScheme.primary,
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationCategory(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+      title: Text(title),
+      trailing: Obx(() => Checkbox(
+        value: controller.isPushNotificationsEnabled.value,
+        onChanged: (val) {
+          if (val != null) {
+            controller.togglePushNotifications(val);
+          }
+        },
+        activeColor: Theme.of(context).colorScheme.primary,
+      )),
     );
   }
 } 

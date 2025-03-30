@@ -4,8 +4,9 @@ import '../controllers/favorites_controller.dart';
 class FavoritesBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<FavoritesController>(
-      () => FavoritesController(),
+    Get.put<FavoritesController>(
+      FavoritesController(),
+      permanent: true,
     );
   }
 } 

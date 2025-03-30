@@ -10,22 +10,22 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_app"
+    namespace = "com.shoevogue.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '11'
     }
 
     defaultConfig {
         // Specify your unique Application ID
-        applicationId = "com.example.flutter_app"
+        applicationId = "com.shoevogue.app"
         // Update these values to match your application needs
         minSdk = 23
         targetSdk = flutter.targetSdkVersion

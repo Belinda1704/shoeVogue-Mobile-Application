@@ -34,6 +34,10 @@ class ProfileController extends GetxController {
   final RxBool orderUpdates = true.obs;
   final RxBool promotions = false.obs;
   
+  // For the new notification view
+  final RxBool isPushNotificationsEnabled = true.obs;
+  final RxBool isEmailNotificationsEnabled = true.obs;
+  
   // Privacy settings
   final RxBool shareData = false.obs;
   final RxBool storePaymentInfo = true.obs;
@@ -104,15 +108,59 @@ class ProfileController extends GetxController {
       _firestoreService.getUserOrders(userId).listen(
         (ordersList) {
           orders.value = ordersList;
+          debugPrint('Loaded ${ordersList.length} orders');
         },
         onError: (error) {
-          // Using debugPrint instead of print for logging errors
           debugPrint('Error loading orders: $error');
-        }
+          // Handle permission error gracefully
+          if (error.toString().contains('permission-denied')) {
+            // Show a snackbar with a message about permissions
+            Get.snackbar(
+              'Permission Error',
+              'You need to sign in again to access your orders',
+              snackPosition: SnackPosition.BOTTOM,
+              duration: const Duration(seconds: 5),
+              backgroundColor: Colors.orange,
+              colorText: Colors.white,
+              borderRadius: 10,
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(15),
+              icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+              onTap: (_) {
+                // Offer a way to fix the issue
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text('Authentication Required'),
+                    content: const Text(
+                      'Your session may have expired. Would you like to sign out and sign back in to refresh your permissions?'
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                          _authService.signOut();
+                        },
+                        child: const Text('Sign Out'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+            
+            // Set orders to empty to prevent repeated errors
+            orders.value = [];
+          }
+        },
       );
     } catch (e) {
-      // Using debugPrint instead of print for logging errors
       debugPrint('Error subscribing to orders: $e');
+      // Set orders to empty to prevent repeated errors
+      orders.value = [];
     }
   }
   
@@ -351,9 +399,11 @@ class ProfileController extends GetxController {
     switch (setting) {
       case 'push':
         pushNotifications.value = value;
+        isPushNotificationsEnabled.value = value;
         break;
       case 'email':
         emailNotifications.value = value;
+        isEmailNotificationsEnabled.value = value;
         break;
       case 'orders':
         orderUpdates.value = value;
@@ -386,6 +436,29 @@ class ProfileController extends GetxController {
     Get.snackbar(
       'Privacy Updated',
       'Your privacy settings have been updated',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+  
+  // New methods for the NotificationsView
+  void togglePushNotifications(bool value) {
+    isPushNotificationsEnabled.value = value;
+    pushNotifications.value = value;
+    
+    Get.snackbar(
+      'Push Notifications',
+      value ? 'Push notifications enabled' : 'Push notifications disabled',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+  
+  void toggleEmailNotifications(bool value) {
+    isEmailNotificationsEnabled.value = value;
+    emailNotifications.value = value;
+    
+    Get.snackbar(
+      'Email Notifications',
+      value ? 'Email notifications enabled' : 'Email notifications disabled',
       snackPosition: SnackPosition.BOTTOM,
     );
   }

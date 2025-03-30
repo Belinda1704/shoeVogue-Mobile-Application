@@ -24,6 +24,8 @@ class AppTranslations extends Translations {
       'next': 'Next',
       'get_started': 'Get Started',
       'image_not_found': 'Image not found',
+      'no_results_found': 'No results found',
+      'try_different_search': 'Try a different search term',
 
       // Onboarding
       'welcome_to_shoevogue': 'Welcome to ShoeVogue',
@@ -126,6 +128,7 @@ class AppTranslations extends Translations {
       // Order Success
       'order_placed_success': 'Order Placed Successfully!',
       'order_delivery_message': 'Your order has been placed and will be delivered soon.',
+      'special_offers': 'Special Offers',
       
       // Product Details
       'Product Details': 'Product Details',
@@ -136,6 +139,18 @@ class AppTranslations extends Translations {
       'no_favorites': 'No favorites yet',
       'add_to_favorites_message': 'Add items to your favorites to see them here',
       'browse_products': 'Browse Products',
+
+      // Notifications
+      'notifications': 'Notifications',
+      'notification_settings': 'Notification Settings',
+      'push_notifications': 'Push Notifications',
+      'push_notifications_desc': 'Receive alerts on your device',
+      'email_notifications': 'Email Notifications',
+      'email_notifications_desc': 'Receive alerts via email',
+      'notification_categories': 'Notification Categories',
+      'order_updates': 'Order Updates',
+      'promotions': 'Promotions & Deals',
+      'new_arrivals': 'New Arrivals',
     },
     'es': {
       // General
@@ -158,6 +173,8 @@ class AppTranslations extends Translations {
       'next': 'Siguiente',
       'get_started': 'Comenzar',
       'image_not_found': 'Imagen no encontrada',
+      'no_results_found': 'No se encontraron resultados',
+      'try_different_search': 'Intenta un término de búsqueda diferente',
 
       // Onboarding
       'welcome_to_shoevogue': 'Bienvenido a ShoeVogue',
@@ -260,6 +277,7 @@ class AppTranslations extends Translations {
       // Order Success
       'order_placed_success': '¡Pedido Realizado con Éxito!',
       'order_delivery_message': 'Tu pedido ha sido realizado y será entregado pronto.',
+      'special_offers': 'Ofertas Especiales',
       
       // Product Details
       'Product Details': 'Detalles del Producto',
@@ -270,6 +288,18 @@ class AppTranslations extends Translations {
       'no_favorites': 'Aún no hay favoritos',
       'add_to_favorites_message': 'Agrega artículos a tus favoritos para verlos aquí',
       'browse_products': 'Explorar Productos',
+
+      // Notifications
+      'notifications': 'Notificaciones',
+      'notification_settings': 'Configuración de Notificaciones',
+      'push_notifications': 'Notificaciones Push',
+      'push_notifications_desc': 'Recibir alertas en su dispositivo',
+      'email_notifications': 'Notificaciones por Correo',
+      'email_notifications_desc': 'Recibir alertas por correo electrónico',
+      'notification_categories': 'Categorías de Notificación',
+      'order_updates': 'Actualizaciones de Pedidos',
+      'promotions': 'Promociones y Ofertas',
+      'new_arrivals': 'Nuevos Lanzamientos',
     },
     'fr': {
       // General
@@ -292,6 +322,8 @@ class AppTranslations extends Translations {
       'next': 'Suivant',
       'get_started': 'Commencer',
       'image_not_found': 'Image non trouvée',
+      'no_results_found': 'Aucun résultat trouvé',
+      'try_different_search': 'Essayez un autre terme de recherche',
 
       // Onboarding
       'welcome_to_shoevogue': 'Bienvenue sur ShoeVogue',
@@ -368,11 +400,29 @@ class AppTranslations extends Translations {
       // Order Success
       'order_placed_success': 'Commande Passée avec Succès!',
       'order_delivery_message': 'Votre commande a été passée et sera livrée bientôt.',
+      'special_offers': 'Offres Spéciales',
+      
+      // Product Details
+      'Product Details': 'Détails du Produit',
+      'Select Size': 'Sélectionner la Taille',
+      'product_description': 'Chaussures de Première Qualité avec un Excellent Comfort et une Grande Durabilité. Parfait pour un Usage Quotidien et les Occasions Spéciales.',
       
       // Favorites
       'no_favorites': 'Pas encore de favoris',
       'add_to_favorites_message': 'Ajoutez des articles à vos favoris pour les voir ici',
       'browse_products': 'Parcourir les Produits',
+
+      // Notifications
+      'notifications': 'Notifications',
+      'notification_settings': 'Paramètres de Notification',
+      'push_notifications': 'Notifications Push',
+      'push_notifications_desc': 'Recevoir des alertes sur votre appareil',
+      'email_notifications': 'Notifications par Email',
+      'email_notifications_desc': 'Recevoir des alertes par email',
+      'notification_categories': 'Catégories de Notification',
+      'order_updates': 'Mises à Jour des Commandes',
+      'promotions': 'Promotions et Offres',
+      'new_arrivals': 'Nouveautés',
     },
     'de': {
       // General
@@ -395,6 +445,8 @@ class AppTranslations extends Translations {
       'next': 'Weiter',
       'get_started': 'Loslegen',
       'image_not_found': 'Bild nicht gefunden',
+      'no_results_found': 'Keine Ergebnisse gefunden',
+      'try_different_search': 'Versuchen Sie einen anderen Suchbegriff',
 
       // Onboarding
       'welcome_to_shoevogue': 'Willkommen bei ShoeVogue',
@@ -471,11 +523,29 @@ class AppTranslations extends Translations {
       // Order Success
       'order_placed_success': 'Bestellung erfolgreich aufgegeben!',
       'order_delivery_message': 'Ihre Bestellung wurde aufgegeben und wird in Kürze geliefert.',
+      'special_offers': 'Sonderangebote',
+      
+      // Product Details
+      'Product Details': 'Produktdetails',
+      'Select Size': 'Größe wählen',
+      'product_description': 'Hochwertige Schuhe mit ausgezeichnetem Komfort und Langlebigkeit. Perfekt für den Alltag und besondere Anlässe.',
       
       // Favorites
       'no_favorites': 'Noch keine Favoriten',
       'add_to_favorites_message': 'Fügen Sie Artikel zu Ihren Favoriten hinzu, um sie hier zu sehen',
       'browse_products': 'Produkte durchsuchen',
+
+      // Notifications
+      'notifications': 'Benachrichtigungen',
+      'notification_settings': 'Benachrichtigungseinstellungen',
+      'push_notifications': 'Push-Benachrichtigungen',
+      'push_notifications_desc': 'Erhalten Sie Benachrichtigungen auf Ihrem Gerät',
+      'email_notifications': 'E-Mail-Benachrichtigungen',
+      'email_notifications_desc': 'Erhalten Sie Benachrichtigungen per E-Mail',
+      'notification_categories': 'Benachrichtigungskategorien',
+      'order_updates': 'Bestellaktualisierungen',
+      'promotions': 'Aktionen und Angebote',
+      'new_arrivals': 'Neuheiten',
     },
   };
 } 

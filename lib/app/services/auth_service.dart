@@ -452,7 +452,7 @@ class AuthService extends GetxService {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       UserCredential? userCredential;
-      
+
       if (kIsWeb) {
         // Web flow
         try {
@@ -463,34 +463,76 @@ class AuthService extends GetxService {
           throw 'Could not sign in with Google. Please try again.';
         }
       } else {
-        // Mobile flow
-        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-        
-        // User canceled the sign-in flow
-        if (googleUser == null) {
-          return null;
-        }
-        
+        // Mobile flow - Fixed implementation
         try {
+          // Sign out from any previous Google Sign-In
+          await _googleSignIn.signOut();
+          
+          // Begin sign in process
+          final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+          // User canceled the sign-in flow
+          if (googleUser == null) {
+            return null;
+          }
+
+          // Get authentication details
           final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-          final OAuthCredential credential = GoogleAuthProvider.credential(
+          
+          // Create credential
+          final AuthCredential credential = GoogleAuthProvider.credential(
             accessToken: googleAuth.accessToken,
             idToken: googleAuth.idToken,
           );
-          
+
+          // Sign in with Firebase
           userCredential = await _auth.signInWithCredential(credential);
+          
+          // Show success message
+          Get.snackbar(
+            'Success',
+            'Signed in with Google successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
         } catch (error) {
           debugPrint('Google Sign In Error: $error');
-          throw 'Could not authenticate with Google. Please try again.';
+          
+          // Show error message to user
+          Get.snackbar(
+            'Google Sign In Error',
+            'Failed to sign in with Google: ${error.toString()}',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          
+          return null;
         }
       }
-      
-      // Save user data to Firestore
-      await _saveUserToFirestore(userCredential?.user);
-      
+
+      // Save user data to Firestore if sign in was successful
+      if (userCredential != null && userCredential.user != null) {
+        await _saveUserToFirestore(userCredential.user);
+        
+        // Navigate to home page on success
+        Get.offAllNamed(Routes.HOME);
+      }
+
       return userCredential;
     } catch (error) {
-      rethrow;
+      // Show a more user-friendly error message
+      Get.snackbar(
+        'Authentication Error',
+        'Something went wrong with Google Sign-In. Please try again or use email login.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      
+      debugPrint('Google Sign In General Error: $error');
+      return null;
     }
   }
   

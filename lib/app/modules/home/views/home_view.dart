@@ -226,7 +226,7 @@ class HomeView extends GetView<HomeController> {
                           ),
                           Expanded(
                             child: Text(
-                              'app_name'.tr,
+                              'ShoeVogue',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 20,
@@ -237,7 +237,8 @@ class HomeView extends GetView<HomeController> {
                           IconButton(
                             icon: Icon(Icons.notifications_outlined, color: Theme.of(context).colorScheme.onPrimary),
                             onPressed: () {
-                              // TODO: Implement notifications
+                              // Navigate to notifications using direct class reference
+                              Get.toNamed('/profile');
                             },
                           ),
                         ],
@@ -256,6 +257,11 @@ class HomeView extends GetView<HomeController> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: TextField(
+                                readOnly: true, // Make it act as a button
+                                onTap: () {
+                                  // Navigate to search page
+                                  Get.toNamed('/search');
+                                },
                                 decoration: InputDecoration(
                                   hintText: 'search_in_store'.tr,
                                   hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)),
@@ -366,7 +372,7 @@ class HomeView extends GetView<HomeController> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'Special Offers',
+              'special_offers'.tr,
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
@@ -572,65 +578,80 @@ class HomeView extends GetView<HomeController> {
   Widget _buildProductCard(BuildContext context, int index) {
     final product = controller.filteredProducts[index];
     return GestureDetector(
-      onTap: () {
-        Get.toNamed('/product-detail', arguments: product);
-      },
+      onTap: () => Get.toNamed('/product-detail', arguments: product),
       child: Card(
-        clipBehavior: Clip.antiAlias,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product image
+            // Product image with favorite icon overlay
             Expanded(
               child: Stack(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                    child: Builder(
-                      builder: (context) {
-                        try {
-                          return Image.asset(
-                            Uri.decodeFull(product['imageUrl']),
+                  // Product image
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                    child: product['imageUrl'] != null
+                        ? Image.asset(
+                            product['imageUrl'],
+                            width: double.infinity,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Error loading image: ${product['imageUrl']}');
-                              debugPrint('Error details: $error');
-                              return _buildImageErrorWidget(context, product['imageUrl']);
+                              return Container(
+                                width: double.infinity,
+                                color: Theme.of(context).colorScheme.surfaceVariant,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.shopping_bag,
+                                    size: 40,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                              );
                             },
-                          );
-                        } catch (e) {
-                          debugPrint('Exception loading image: ${product['imageUrl']}');
-                          debugPrint('Exception details: $e');
-                          return _buildImageErrorWidget(context, product['imageUrl']);
-                        }
-                      }
-                    ),
+                          )
+                        : Container(
+                            width: double.infinity,
+                            color: Theme.of(context).colorScheme.surfaceVariant,
+                            child: Center(
+                              child: Icon(
+                                Icons.shopping_bag,
+                                size: 40,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ),
                   ),
+                  // Favorite button overlay
                   Positioned(
-                    top: 8,
-                    right: 8,
-                    child: InkWell(
-                      onTap: () {
-                        controller.toggleFavorite(product['id']);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface.withAlpha(200),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          product['isFavorite'] ?? false
-                              ? Icons.favorite
+                    top: 5,
+                    right: 5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          product['isFavorite'] == true 
+                              ? Icons.favorite 
                               : Icons.favorite_border,
-                          color: Colors.red,
-                          size: 18,
+                          color: product['isFavorite'] == true 
+                              ? Colors.red 
+                              : Colors.grey,
+                          size: 20,
                         ),
+                        constraints: const BoxConstraints(
+                          minWidth: 30,
+                          minHeight: 30,
+                        ),
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          controller.toggleFavorite(product['id']);
+                        },
                       ),
                     ),
                   ),
@@ -638,7 +659,7 @@ class HomeView extends GetView<HomeController> {
               ),
             ),
             
-            // Product details
+            // Product details and add to cart
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -655,47 +676,41 @@ class HomeView extends GetView<HomeController> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    CurrencyFormatter.formatPrice(product['price']),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        CurrencyFormatter.formatPrice(product['price']),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // Add to cart button
+                      InkWell(
+                        onTap: () {
+                          controller.addToCart(product['id']);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Icon(
+                            Icons.add_shopping_cart,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildImageErrorWidget(BuildContext context, String imageUrl) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.image_not_supported,
-            size: 40,
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
-          ),
-          const SizedBox(height: 4),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              'Image not available',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.4),
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
       ),
     );
   }

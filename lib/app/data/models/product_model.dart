@@ -74,11 +74,11 @@ class Product {
       name: map['name'] ?? '',
       description: map['description'] ?? '',
       price: (map['price'] ?? 0).toDouble(),
-      imageUrl: map['imageUrl'] ?? '',
+      imageUrl: map['imageUrl'] ?? 'assets/images/products/placeholder.png', // Default image
       images: List<String>.from(map['images'] ?? []),
       stock: map['stock'] ?? 0,
-      brand: map['brand'] ?? '',
-      category: map['category'] ?? '',
+      brand: map['brand'] ?? 'Unknown Brand',
+      category: map['category'] ?? 'Uncategorized',
       features: List<String>.from(map['features'] ?? []),
       sizes: List<String>.from(map['sizes'] ?? []),
       colors: List<String>.from(map['colors'] ?? []),
@@ -87,8 +87,12 @@ class Product {
       featured: map['featured'] ?? false,
       onSale: map['onSale'] ?? false,
       salePrice: (map['salePrice'] ?? 0).toDouble(),
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
-      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      createdAt: (map['createdAt'] is Timestamp) 
+          ? (map['createdAt'] as Timestamp).toDate() 
+          : DateTime.now(),
+      updatedAt: (map['updatedAt'] is Timestamp) 
+          ? (map['updatedAt'] as Timestamp).toDate() 
+          : DateTime.now(),
     );
   }
 

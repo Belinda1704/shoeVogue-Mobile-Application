@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'dart:async';
 import '../../../services/firestore_service.dart';
 import '../../../data/models/banner_model.dart';
@@ -498,7 +497,7 @@ class HomeController extends GetxController {
         'id': '34',
         'name': "Women's Shoe",
         'price': 139.99,
-        'imageUrl': "assets/images/products/Women's Shoe.png",
+        'imageUrl': "assets/images/products/women shoe.png",
         'category': 'Sports',
         'isFavorite': false,
       },

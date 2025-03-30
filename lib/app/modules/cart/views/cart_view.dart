@@ -25,10 +25,10 @@ class CartView extends GetView<CartController> {
         return false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('cart'.tr),
+      appBar: AppBar(
+        title: Text('cart'.tr),
           backgroundColor: AppTheme.primaryBlue,
-          foregroundColor: Colors.white,
+        foregroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -43,38 +43,38 @@ class CartView extends GetView<CartController> {
               bottom: Radius.circular(16),
             ),
           ),
-        ),
-        body: Obx(() {
-          if (controller.cartItems.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
+      ),
+      body: Obx(() {
+        if (controller.cartItems.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.shopping_cart_outlined,
                     size: 100,
-                    color: Colors.grey[400],
-                  ),
+                  color: Colors.grey[400],
+                ),
                   const SizedBox(height: 24),
-                  Text(
-                    'cart_empty'.tr,
+                Text(
+                  'cart_empty'.tr,
                     style: theme.textTheme.headlineMedium,
-                  ),
+                ),
                   const SizedBox(height: 12),
-                  Text(
-                    'add_items_to_cart'.tr,
+                Text(
+                  'add_items_to_cart'.tr,
                     style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
-                  ),
+                ),
                   const SizedBox(height: 36),
-                  ElevatedButton(
-                    onPressed: () {
+                ElevatedButton(
+                  onPressed: () {
                       // Navigate to home tab using HomeController
                       homeController.changePage(0);
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
+                    Get.back();
+                  },
+                  style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryBlue,
-                      foregroundColor: Colors.white,
+                    foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -88,37 +88,37 @@ class CartView extends GetView<CartController> {
                         fontSize: 16,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: controller.cartItems.length,
-                  padding: const EdgeInsets.all(16),
-                  itemBuilder: (context, index) {
-                    final item = controller.cartItems[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 16),
+                ),
+              ],
+            ),
+          );
+        }
+        
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: controller.cartItems.length,
+                padding: const EdgeInsets.all(16),
+                itemBuilder: (context, index) {
+                  final item = controller.cartItems[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Padding(
+                    child: Padding(
                         padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            // Product Image
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
+                      child: Row(
+                        children: [
+                          // Product Image
+                          Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
                                 color: AppTheme.lightBlue,
-                                borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.05),
@@ -129,9 +129,9 @@ class CartView extends GetView<CartController> {
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
+                            child: Image.asset(
                                   item['imageUrl'] ?? 'assets/images/placeholder.png',
-                                  fit: BoxFit.cover,
+                              fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Center(
                                       child: Icon(
@@ -143,17 +143,17 @@ class CartView extends GetView<CartController> {
                                   },
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Product Details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
+                          ),
+                          const SizedBox(width: 16),
+                          // Product Details
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
                                     item['name'] ?? 'Unknown Product',
                                     style: theme.textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.bold,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -185,22 +185,22 @@ class CartView extends GetView<CartController> {
                                                 Color(int.parse(item['color'].substring(1), radix: 16) + 0xFF000000) : 
                                                 Colors.grey,
                                               borderRadius: BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                                   const SizedBox(height: 8),
-                                  Row(
+                          Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
+                            children: [
+                              Text(
                                         formatCurrency((item['price'] ?? 0.0) * (item['quantity'] ?? 1)),
                                         style: theme.textTheme.headlineMedium?.copyWith(
                                           color: AppTheme.primaryBlue,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                                       // Quantity controls
                                       Row(
                                         children: [
@@ -250,14 +250,14 @@ class CartView extends GetView<CartController> {
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
+            ),
               
               // Checkout section at bottom
               Container(
@@ -351,9 +351,9 @@ class CartView extends GetView<CartController> {
                   ],
                 ),
               ),
-            ],
-          );
-        }),
+          ],
+        );
+      }),
       ),
     );
   }

@@ -11,4 +11,10 @@ flutter test test/widget/responsive/responsive_widgets_test.dart
 echo Running Integration Tests...
 flutter test integration_test/app_test.dart
 
-echo All tests completed! 
+echo All tests completed!
+
+echo Running widget tests for ShoeVogue app...
+flutter test test/simple_widget_tests.dart
+echo.
+echo Tests completed. 20 widget tests should have passed!
+pause 

@@ -83,4 +83,67 @@ flutter test integration_test/
 - Add network service mocking for offline testing
 - Implement screenshot comparison testing
 - Expand test coverage for authentication flows
-- Add performance testing for critical operations 
+- Add performance testing for critical operations
+
+# Widget Tests for ShoeVogue App
+
+This directory contains widget tests for the ShoeVogue Flutter application. The tests cover at least 20 different Flutter widgets used throughout the app.
+
+## Running the Tests
+
+To run all the widget tests, execute the following command from the project root:
+
+```bash
+flutter test test/widget_tests.dart
+```
+
+## Test Coverage
+
+The widget tests cover the following 20 widgets:
+
+1. Scaffold
+2. Container with BoxDecoration
+3. Row
+4. Column
+5. ElevatedButton
+6. IconButton
+7. ListView
+8. Card
+9. TextField
+10. CircularProgressIndicator
+11. Padding
+12. Stack
+13. SizedBox
+14. ClipRRect
+15. Divider
+16. GestureDetector
+17. Expanded
+18. SingleChildScrollView
+19. Center
+20. InkWell
+
+## Additional Dependencies
+
+To run these tests, make sure you have the following dependencies in your pubspec.yaml:
+
+```yaml
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mockito: ^5.0.0
+  build_runner: ^2.0.0
+```
+
+## Generating Mocks
+
+The tests use mocked services. To regenerate the mocks, run:
+
+```bash
+flutter pub run build_runner build
+```
+
+## Notes
+
+- These tests are designed to verify the basic functionality and rendering of Flutter widgets.
+- They use mock implementations of services to avoid network calls during testing.
+- Each test is independent and can be run separately. 

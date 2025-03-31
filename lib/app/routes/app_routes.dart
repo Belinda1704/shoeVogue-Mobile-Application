@@ -29,6 +29,7 @@ abstract class Routes {
   static const VERIFY_OTP = '/verify-otp';
   static const PRODUCTS = '/products';
   static const USERS = '/users';
+  static const AI_FEATURES = '/ai-features';
 }
 
 abstract class _Paths {
@@ -58,4 +59,5 @@ abstract class _Paths {
   static const VERIFY_OTP = '/verify-otp';
   static const PRODUCTS = '/products';
   static const USERS = '/users';
+  static const AI_FEATURES = '/ai-features';
 } 

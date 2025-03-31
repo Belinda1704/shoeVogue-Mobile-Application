@@ -37,6 +37,8 @@ import '../modules/products/bindings/product_binding.dart';
 import '../modules/products/views/product_list_view.dart';
 import '../modules/users/bindings/user_binding.dart';
 import '../modules/users/views/user_list_view.dart';
+import '../modules/ai_features/bindings/ai_features_binding.dart';
+import '../modules/ai_features/views/ai_features_view.dart';
 
 part 'app_routes.dart';
 
@@ -164,6 +166,11 @@ class AppPages {
       name: Routes.USERS,
       page: () => const HomeView(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: Routes.AI_FEATURES,
+      page: () => const AiFeaturesView(),
+      binding: AiFeaturesBinding(),
     ),
   ];
 } 

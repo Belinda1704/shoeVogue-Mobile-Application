@@ -49,6 +49,40 @@ class ProductDetailView extends GetView<ProductDetailController> {
                   ),
                 ),
                 
+                // AI Features Buttons
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => Get.toNamed('/ai-features'),
+                          icon: const Icon(Icons.camera_alt),
+                          label: Text('AI Size Finder'.tr),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => Get.toNamed('/ai-features'),
+                          icon: const Icon(Icons.checkroom),
+                          label: Text('Virtual Try-On'.tr),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
                 // Product Info
                 Padding(
                   padding: const EdgeInsets.all(16.0),

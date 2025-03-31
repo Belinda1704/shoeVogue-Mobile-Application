@@ -89,6 +89,15 @@ class HomeView extends GetView<HomeController> {
             ),
             const Divider(),
             ListTile(
+              leading: Icon(Icons.smart_toy, color: Theme.of(context).colorScheme.primary),
+              title: const Text('AI Features'),
+              subtitle: const Text('Size Finder & Virtual Try-On'),
+              onTap: () {
+                Get.back();
+                Get.toNamed('/ai-features');
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
               title: Text('profile'.tr),
               onTap: () {

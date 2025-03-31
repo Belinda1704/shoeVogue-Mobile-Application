@@ -1,4 +1,4 @@
-# ShoeVogue - Flutter Mobile Application
+# ShoeVogue - Flutter Mobile Application (App)
 
 ## Overview
 ShoeVogue is a mobile application dedicated to providing a seamless shoe shopping experience. The app uses **GetX for state management** and follows best practices in Flutter development.

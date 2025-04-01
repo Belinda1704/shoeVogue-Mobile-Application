@@ -14,6 +14,50 @@
       },
       "oauth_client": [
         {
+          "client_id": "872644437819-umdtjt0jshehcch0ls4j271d48j6s0h3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_app",
+            "certificate_hash": "7a1dc3b33f3826c6141584aa5f3a8cc9e60913db"
+          }
+        },
+        {
+          "client_id": "872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4ZD8ImklUC4ybVw-Edp4aFziOxjyuiMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "872644437819-el33l1spk4smsditl4blja0fmu83qsij.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.shoevogue.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872644437819:android:5bb7e9d99fb62c108cb91e",
+        "android_client_info": {
+          "package_name": "com.example.shoevogue_grp8_project"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "872644437819-sp9k9itcmojoi5tnbc2e5v9nfqgb8vp4.apps.googleusercontent.com",
           "client_type": 3
         }

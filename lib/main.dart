@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'app/services/auth_service.dart';
@@ -20,7 +21,8 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+  ).then((value) => foundation.debugPrint('Firebase initialized successfully!'))
+  .catchError((error) => foundation.debugPrint('Error initializing Firebase: $error'));
   
   // Initialize GetStorage
   await GetStorage.init();
